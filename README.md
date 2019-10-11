@@ -4,10 +4,9 @@
 ## Description
 Embedded home security camera system which can stream video of events at front door to a locally hosted web session. Images/Videos are intelligently analyzed and a description of the nature of the event is displayed to the user who can authorize appropriate actions such as openning door via a smart lock. 
 
-#Architecture Diagrams 
-Activity https://go.gliffy.com/go/share/image/sr0pe8knaa19fgfq9qy1.png?utm_medium=live-embed&utm_source=custom
-Sequence https://go.gliffy.com/go/share/image/slbc2iovuksl3v2gt6qo.png?utm_medium=live-embed&utm_source=custom
-
+# Architecture Diagrams 
+- Activity https://go.gliffy.com/go/share/image/sr0pe8knaa19fgfq9qy1.png?utm_medium=live-embed&utm_source=custom 
+- Sequence https://go.gliffy.com/go/share/image/slbc2iovuksl3v2gt6qo.png?utm_medium=live-embed&utm_source=custom
 
 
 ## Materials 
