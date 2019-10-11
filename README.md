@@ -12,6 +12,7 @@ Embedded home security camera system which can stream video of events at front d
   * *future version will use a smaller board such as an Arduino nano*
 * ESP8266 wifi module 
 * Arducam Mini Module Camera Shield
+* August Smart Lock
 
 
 ## Arduino Code 
