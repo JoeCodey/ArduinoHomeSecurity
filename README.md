@@ -2,7 +2,7 @@
 
 
 ## Description
-Embedded home security camera system which can stream video of events at front door to a locally hosted web session. Images/Videos are intelligently analyzed and description the nature of the event is displayed to user who can authorize appropriate actions such as openning door via a smart lock. 
+Embedded home security camera system which can stream video of events at front door to a locally hosted web session. Images/Videos are intelligently analyzed and a description of the nature of the event is displayed to the user who can authorize appropriate actions such as openning door via a smart lock. 
 
 
 
