@@ -25,7 +25,7 @@ Arduino's main role will be to control the camera ,and establish communication o
 The server (either local or in the cloud) will use OpenCV to perfrom intelligent analysis on the data provided. The server will then stream the images/video to a web interface with results from the analysis, so that the user can act on the situation. 
 
 ## Web page 
-The web page will display the video gathered from the Arducam camera along with the results of the analysis of the image processing server. The User can then provide input on their decision to open the door or do nothing and remain anonymous. 
+The web page will display the video gathered from the Arducam camera along with the results of the analysis of the image processing server. 
 
 
 
