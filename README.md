@@ -19,10 +19,10 @@ Embedded home security camera system which can stream video of events at front d
 
 
 ## Arduino Code 
-Arduino main role will be to control the camera , and establish communication over wifi with the a server for image processing.  The arduino should should be listening for commands over wifi from the user manually or from a google home request.
+Arduino's main role will be to control the camera ,and establish communication over wifi with a server for image processing.  The Arduino should be listening for commands over wifi from the user manually or from a google home request.
 
 ## Image Processing Server
-The server (either local or in the cloud) will use OpenCV to perfrom intelligent analysis on the data provided. The server will then stream the images/video to a web interface with results from the analysis, such as that the user can act on the situation. 
+The server (either local or in the cloud) will use OpenCV to perfrom intelligent analysis on the data provided. The server will then stream the images/video to a web interface with results from the analysis, so that the user can act on the situation. 
 
 ## Web page 
 The web page will display the video gathered from the Arducam camera along with the results of the analysis of the image processing server. The User can then provide input on their decision to open the door or do nothing and remain anonymous. 
