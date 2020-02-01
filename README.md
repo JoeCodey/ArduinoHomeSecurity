@@ -31,7 +31,7 @@ Originally the arduino's main role will be to control a camera to establish esta
 The arduino should be used for a very specifc repeatble task, which is limited by fast I/O and unique analog sensors. The arduino will be use a passive infrared sensor (PIR) or a laser trip sensor to log both TimeIN/TimeOut of people entering the home and control an entrance light. 
 
 ### freeRTOS
-![Alt](Arduino_State_Diagram.svq)
+![Alt](Arduino_State_Diagram.svg) 
 
 
 ## Image Processing Server
