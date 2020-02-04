@@ -1,0 +1,9 @@
+node_modules
+ArduinoUnit/Joe*
+ArduinoUnit/ArduCam
+ArduinoUnit/libraries
+ArduinoUnit/SetUpTests
+.vscode/*
+ArduCam/*
+sourceCode_arduCamArduino/*
+package-lock.json

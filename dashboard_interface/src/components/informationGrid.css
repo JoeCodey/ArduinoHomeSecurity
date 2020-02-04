@@ -1,0 +1,23 @@
+
+
+  * {box-sizing: border-box;}
+
+  .grid-wrapper {
+      border: 2px solid #f76707;
+      border-radius: 10px;
+      background-color: #fff4e6;
+  }
+  
+  .grid-wrapper > div {
+      border: 2px solid #ffa94d;
+      border-radius: 5px;
+      background-color: #ffd8a8;
+      padding: 1em;
+      color: #d9480f;
+  }
+
+  .grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+  }
