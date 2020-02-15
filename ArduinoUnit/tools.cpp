@@ -1,14 +1,24 @@
-#include "espTools.hpp"
+ #include "espTools.hpp"
 
-    int startTCP(String IP ) {
-        
+    int startTCP(String ip_address ) {
+        char *serial_cmd[50] ;
 
         String cmd = "AT+CIPSTART=\"TCP\",\"";//set up TCP connection
-        cmd += IP;
-        cmd += "\",65432";
-        Serial.println(cmd);
+        cmd += ip_address;
+        cmd += "\",8080";
+        //cmd.toCharArray(serial_cmd,sizeof(serial_cmd));
         delay(1000);
-        if(Serial.find("Error")){
+        Serial.print("startTCP command: "+cmd);
+        Serial1.println(cmd);
+        delay(5000);
+        if(Serial1.available()) Serial.println(Serial1.read());
+        if(Serial1.find("OK")){
+        Serial.println("TCP is OK!");
+        // connectWiFi();
+        }
+    
+
+        if(Serial1.find("Error")){
             Serial.println("AT+CIPSTART Error");
             return 0;
         }
@@ -18,16 +28,19 @@
 
     int sendEvent_TCP(String data){
         String cmd ; 
-
+        char *serial_cmd[50] ;
       
         cmd += data ;
-        Serial.print("AT+CIPSEND=");//send TCP/IP data
-        Serial.println(cmd.length());
+        Serial1.print("AT+CIPSEND=");//send TCP/IP data
+        Serial1.println(cmd.length());
+        //cmd.toCharArray(serial_cmd,sizeof(serial_cmd));
+        //Serial1Com.write(serial_cmd.length());
         delay(1000);
         delay(1000);
-        Serial.print(cmd); 
-        if(Serial.find(">")){ 
-            Serial.print(cmd); 
+        Serial1.println(cmd); 
+        if(Serial1.find(">")){ 
+            Serial1.println(cmd); 
+            Serial.println("send: "+cmd);
             return 1 ;
         }
         else
@@ -35,7 +48,6 @@
             return 0 ; 
 
     }
-
 
 
 

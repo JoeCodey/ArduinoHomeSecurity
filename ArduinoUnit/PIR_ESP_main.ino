@@ -1,24 +1,30 @@
 
+
 #include "espTools.hpp" 
 
-#define IP "127.0.0.1" 
+
+#define IP "192.168.2.68"
 
 int ledPin = 43;                // choose the pin for the LED
 int inputPin = 35;               // choose the input pin (for PIR sensor)
 int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading the pin status
-
+int eventId = 0 ; 
+String message = "";
+ 
+// SoftwareSerial Serial1(19,18);
 
 
 void setup(){
     pinMode(ledPin, OUTPUT);      // declare LED as output∏
     pinMode(inputPin, INPUT);     // declare sensor as input
-
-    Serial.begin(9600) ; // baud rate of ESP8266
-    Serial.println("AT");
+    Serial.begin(9600);
+    Serial1.begin(9600) ; // baud rate of MY (yours may be different)ESP8266
+    delay(1000);
+    Serial1.println("AT");
     delay(5000);
     // check that ESP8266 is reponsive
-    if(Serial.find("OK")){
+    if(Serial1.find("OK")){
         Serial.println("OK");
         // connectWiFi();
         startTCP(IP);
@@ -31,9 +37,6 @@ void setup(){
 
 void loop(){
 
-    
-
-    
     val = digitalRead(inputPin);// read input value
 
     if (val == HIGH) {            // check if the input is HIGH
@@ -41,7 +44,10 @@ void loop(){
         if (pirState == LOW) {
         // we have just turned on
         Serial.println("Motion detected!");
-        if(!sendEvent_TCP("TCP messaage: \n\t Motion detected!")) return;
+        eventId++;
+        message = "TCPmessage: Motion Event Detected id_#"; 
+        
+        if(!sendEvent_TCP(message)) Serial.println("message send failed");
         // We only want to print on the output change, not state
         pirState = HIGH;
         }
@@ -51,7 +57,8 @@ void loop(){
         if (pirState == HIGH){
         // we have just turned of
         Serial.println("Motion ended!");
-        if(!sendEvent_TCP("TCP message: \n\t Motion detected!")) return;
+        
+        if(!sendEvent_TCP("TCPmessage: Motion Event ended id_#"))  Serial.println("message send failed");
         // We only want to print on the output change, not state
         pirState = LOW;
         }
@@ -60,20 +67,4 @@ void loop(){
 
 
 
-// void setup(){
-//   Serial.begin(115200);
-//   String cmd = "AT+CIPSTART=\"TCP\",\"";//set up TCP connection
-//   cmd += IP;
-//   cmd += "\",80";
-//   Serial.println(cmd);
-// }
-
-// void loop(){
-//     String cmd = "AT+CIPSTART=\"TCP\",\"";//set up TCP connection
-//   cmd += IP;
-//   cmd += "\",80";
-//   Serial.println(cmd);
-
-
-// }
 
