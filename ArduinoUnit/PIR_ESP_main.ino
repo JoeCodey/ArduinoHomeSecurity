@@ -1,6 +1,6 @@
 
 
-#include "espTools.hpp" 
+#include "EspTools.hpp" 
 
 
 #define IP "192.168.2.68"
@@ -11,8 +11,10 @@ int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading the pin status
 int eventId = 0 ; 
 String message = "";
- 
+
 // SoftwareSerial Serial1(19,18);
+
+EspTools esptools ; 
 
 
 void setup(){
@@ -27,7 +29,7 @@ void setup(){
     if(Serial1.find("OK")){
         Serial.println("OK");
         // connectWiFi();
-        startTCP(IP);
+        esptools.attemptConnection(IP, esptools.TCP);
         delay(1000);
     }else{
         Serial.println("ESP8266 unresponsive!!");
@@ -47,7 +49,7 @@ void loop(){
         eventId++;
         message = "TCPmessage: Motion Event Detected id_#"; 
         
-        if(!sendEvent_TCP(message)) Serial.println("message send failed");
+        if(!esptools.sendEvent_TCP(message)) Serial.println("message send failed");
         // We only want to print on the output change, not state
         pirState = HIGH;
         }
@@ -58,7 +60,7 @@ void loop(){
         // we have just turned of
         Serial.println("Motion ended!");
         
-        if(!sendEvent_TCP("TCPmessage: Motion Event ended id_#"))  Serial.println("message send failed");
+        if(!esptools.sendEvent_TCP("TCPmessage: Motion Event ended id_#"))  Serial.println("message send failed");
         // We only want to print on the output change, not state
         pirState = LOW;
         }
