@@ -1,7 +1,8 @@
-#include "EspTools.hpp"
+#include "EspTools.h"
 
 
 void checkSerialResponse() {
+    delay(1000);
     // Check to to see if ESP8266 responds
     // prints the command sent and the response 
     //(i.e. everything received by the ESP serial port)
@@ -35,24 +36,24 @@ EspTools::attemptConnection(String ip_address, CommProtocol protocolChoice)
     cmd += ip_address;
     cmd += "\",8080";
 
-    delay(1000);
+   
     Serial.println("startTCP command: \n" + cmd);
     Serial1.println(cmd);
-    delay(5000);
-    checkSerialResponse() ; 
+    delay(3000);
+    //checkSerialResponse() ; 
 
+    // Respones from ESP8266 { Ok, ERROR}
     if (Serial1.find("OK"))
     {
-        Serial.println("TCP is OK!");
-        // connectWiFi();
-    }
-
-    if (Serial1.find("Error"))
+        Serial.println("TCP Connected @"+ip_address);
+        return 1 ; 
+    }else if (Serial1.find("ERROR"))
     {
         Serial.println("AT+CIPSTART Error");
-        return 0;
+        return 0 ;
+    }else if(Serial1.find("ALREADY CONNECTED")){
+        return 1; 
     }
-    return 1;
 }
 
 EspTools::sendEvent_TCP(String data)
@@ -69,15 +70,16 @@ EspTools::sendEvent_TCP(String data)
     delay(1000);
     Serial1.println(cmd);
     delay(3000);
-    checkSerialResponse() ; 
+    //checkSerialResponse() ;
+     
     if (Serial1.find(">"))
     {
+        //send commmand
         Serial1.println(cmd);
-        Serial.println("send: " + cmd);
-        return 1;
-    }
-    else
+        
+    }else {
         Serial.println("AT+CIPSEND error");
+    }
     return 0;
 }
 

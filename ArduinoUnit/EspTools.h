@@ -1,7 +1,10 @@
 
+
+
+#ifndef ESPTOOLS_H
+#define ESPTOOLS_H
+
 #include <Arduino.h>
-#ifndef CONNECTWIFI_H_INCLUDED
-#define CONNECTWIFI_H_INCLUDED
 
 class EspTools
 {
@@ -23,3 +26,4 @@ public:
 };
 
 #endif
+
