@@ -2,7 +2,7 @@
 
 #include "/Users/josephlefebvre/ArduinoHomeSecurity/ArduinoUnit/EspTools.h"
 #include "/Users/josephlefebvre/ArduinoHomeSecurity/ArduinoUnit/EspTools.cpp"
-
+#include <EEPROM.h> 
 #define IP "192.168.2.68"
 
 EspTools esptools ; 
@@ -11,10 +11,6 @@ EspTools esptools ;
 //   assertEqual(x, 1);
 // }
 
-test(incorrect) {
-  int x = 1;
-  assertNotEqual(x, 1);
-}
 
 test(responsive){
   int reply=0 ; 
@@ -32,9 +28,23 @@ test(responsive){
 test(attemptConnection){
   
   int reply = esptools.attemptConnection(IP,esptools.TCP);
-  checkSerialResponse() ; 
+  //checkSerialResponse() ; 
   assertEqual(reply,1) ; 
 }
+
+// test(writeByteToEEPROM){
+//   //!!! Only run this test when specifically testing EEPROM !
+//   // (don't want to waste read/write cycles)
+//   int addr = 0 ; 
+//   byte val = 5 ; 
+//   EEPROM.write(addr,val); 
+//   byte valStored= EEPROM.read(addr);
+//   Serial.print("***\tvalStored -> ");
+//   Serial.println(valStored);
+  
+//  assertEqual(val,valStored);  
+//   //Serial.println(freeMemory());
+// }
 
 void setup() {
   delay(1000); // wait for stability on some boards to prevent garbage Serial

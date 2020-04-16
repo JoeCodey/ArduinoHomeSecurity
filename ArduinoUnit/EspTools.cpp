@@ -23,8 +23,7 @@ EspTools::attemptConnection(String ip_address, CommProtocol protocolChoice)
     char *serial_cmd[50];
     String protocol;
     switch (protocolChoice)
-    {
-    case TCP:
+    {case TCP:
         protocol = "TCP";
         break;
     case UDP:
@@ -36,12 +35,10 @@ EspTools::attemptConnection(String ip_address, CommProtocol protocolChoice)
     cmd += ip_address;
     cmd += "\",8080";
 
-   
     Serial.println("startTCP command: \n" + cmd);
     Serial1.println(cmd);
-    delay(3000);
+    delay(1500);
     //checkSerialResponse() ; 
-
     // Respones from ESP8266 { Ok, ERROR}
     if (Serial1.find("OK"))
     {
@@ -51,7 +48,7 @@ EspTools::attemptConnection(String ip_address, CommProtocol protocolChoice)
     {
         Serial.println("AT+CIPSTART Error");
         return 0 ;
-    }else if(Serial1.find("ALREADY CONNECTED")){
+    }else if(Serial1.find("ALREADY CONNECTED")){    
         return 1; 
     }
 }
@@ -59,28 +56,27 @@ EspTools::attemptConnection(String ip_address, CommProtocol protocolChoice)
 EspTools::sendEvent_TCP(String data)
 {
     String cmd;
-    char *serial_cmd[50];
-
+    int failFlag = 0 ; 
     cmd += data;
     Serial1.print("AT+CIPSEND="); //send TCP/IP data
     Serial1.println(cmd.length());
     //cmd.toCharArray(serial_cmd,sizeof(serial_cmd));
     //Serial1Com.write(serial_cmd.length());
     delay(1000);
-    delay(1000);
+    // delay(1000);
     Serial1.println(cmd);
-    delay(3000);
+    //delay(3000);
     //checkSerialResponse() ;
      
     if (Serial1.find(">"))
     {
         //send commmand
         Serial1.println(cmd);
-        
+        failFlag = 1 ; // Successful Transmission 
     }else {
         Serial.println("AT+CIPSEND error");
     }
-    return 0;
+    return failFlag ;
 }
 
 EspTools::connectWIFI()
