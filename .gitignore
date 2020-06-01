@@ -7,3 +7,4 @@ ArduinoUnit/SetUpTests
 ArduCam/*
 sourceCode_arduCamArduino/*
 package-lock.json
+.DS_Store
