@@ -32,6 +32,11 @@ test(attemptConnection){
   assertEqual(reply,1) ; 
 }
 
+test(realtime){
+
+  
+}
+
 // test(writeByteToEEPROM){
 //   //!!! Only run this test when specifically testing EEPROM !
 //   // (don't want to waste read/write cycles)
