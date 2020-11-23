@@ -1,8 +1,10 @@
 #include "AUnit.h"
-
+#include "ESP8266WiFi.h"
 #include "/Users/josephlefebvre/ArduinoHomeSecurity/ArduinoUnit/EspTools.h"
 #include "/Users/josephlefebvre/ArduinoHomeSecurity/ArduinoUnit/EspTools.cpp"
 #include <EEPROM.h> 
+
+
 #define IP "192.168.2.68"
 
 EspTools esptools ; 
@@ -10,8 +12,6 @@ EspTools esptools ;
 //   int x = 1;
 //   assertEqual(x, 1);
 // }
-
-
 test(responsive){
   int reply=0 ; 
   Serial1.println("AT");
@@ -30,6 +30,18 @@ test(attemptConnection){
   int reply = esptools.attemptConnection(IP,esptools.TCP);
   //checkSerialResponse() ; 
   assertEqual(reply,1) ; 
+}
+
+test(checkIpaddress){
+   Serial1.println("AT+CIFSR");
+  checkSerialResponse() ; 
+  assertEqual(1,1);
+}
+
+test(wifiServerOnESP){
+  WiFiServer server(80);
+  assertEqual(Wifi.status() ==  WL_CONNECTED,true);
+
 }
 
 // test(writeByteToEEPROM){

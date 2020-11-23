@@ -18,6 +18,7 @@ void checkSerialResponse() {
 
 EspTools::EspTools() {}
 
+
 EspTools::attemptConnection(String ip_address, CommProtocol protocolChoice)
 {
     char *serial_cmd[50];
