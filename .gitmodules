@@ -1,0 +1,3 @@
+[submodule "esp12Eas_Sensor-Server"]
+	path = esp12Eas_Sensor-Server
+	url = https://github.com/JoeCodey/esp12Eas_Sensor-Server
