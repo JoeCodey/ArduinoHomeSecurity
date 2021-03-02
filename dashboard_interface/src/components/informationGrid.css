@@ -3,6 +3,21 @@
   * {box-sizing: border-box;}
 
   .grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+    grid-auto-rows: minmax(100px, auto);
+    justify-content: center;
+    align-content: center ;
+  }
+
+  .gridId{
+    display: grid;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .grid-wrapper {
       border: 2px solid #f76707;
       border-radius: 10px;
       background-color: #fff4e6;
@@ -16,8 +31,4 @@
       color: #d9480f;
   }
 
-  .grid-wrapper {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 10px;
-  }
+  

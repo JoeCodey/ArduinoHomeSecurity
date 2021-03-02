@@ -28,7 +28,7 @@ function App() {
       <div className="Grid-Layouts">
         <GridInformation />
       </div>
-    </div>
+    </div> 
   );
 }
 
