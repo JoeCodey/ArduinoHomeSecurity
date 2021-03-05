@@ -1,47 +1,13 @@
 import React, {Component} from 'react';
 import {useState} from 'react' ;
-class InformationBlock extends React.Component {
-    constructor(props){
-        super(props);
-       
-
-    }
-
-    gridBlockSetUp(){
-        // Returns JSX setting up initial grid properties
-        if (this.props.dataType == "video"){
-            return(
-            <video width="320" height="220" controls>
-                <source src='videos/output.mp4' type="video/mp4"></source>
-            </video>
-            )
-        }else if(this.props.blockSize == "focus"){
-            return (<p style={{fontSize:20}}> {this.props.dataType} </p> ) ;
-        }else{
-            return (<p style={{fontSize:10}}> {this.props.dataType} </p> ) ;
-        }
-    
-    }
-    
-    render(){
-        return (
-            <div class="grid-item" >
-                
-                {this.gridBlockSetUp()}
-                {/* <p style={{fontSize:10}}> {this.props.blockId}</p> */}
-            </div>
-        )   ;
-    }
-} 
-
-
-
 
 const IndivBlock = (props) => {
-        
 
-    
-        function condRenderDatatype(props){
+    const [dataType, setDataType] = useState({dataType: "text"})
+
+    function updateState (newState) { setDataType({newState})} 
+
+    function condRenderDatatype(props){
                 // Returns JSX setting up initial grid properties
                 if (props.dataType == "video"){
                     return(
@@ -62,54 +28,27 @@ const IndivBlock = (props) => {
                 
     }
 
-
-
     return (
             <>
                 {condRenderDatatype(props)}
                 <p style={{fontSize:10}}> {props.blockId}</p>
             </>
         )   ;
-    
-
 }
 
+// Generate initial starting states for grid in the form of  { id  : {dataType: "type" , data: ""}}
+const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 == 0 ? "text" : "video", data: " "}}), {})
 
- 
-const GridInformation  = () => {
 
-    const [dataTypes, setDataType] = useState([
-        {dataType: 'text',
-         metaData: {motionDetected: true, Date: new Date, location: "Entrance"} },
-        {dataType: 'video'},
-        {dataType: 'text',
-        metaData: {motionDetected: true, Date: new Date, location: "Entrance"} },
-        {dataType: 'video'},
-        {dataType: 'text',
-        metaData: {motionDetected: true, Date: new Date, location: "Entrance"}},
-        {dataType: 'video'},
-        {dataType: 'text',
-        metaData: {motionDetected: true, Date: new Date, location: "Entrance"} },
-        {dataType: 'video'}
-    ]) ;
+const GridInformation  = ({dataTypes}) => {
 
-    
-    // setSizeBlock(){
-    //     if(this.props.elementSize == "focus"){
-    //         style=
-    //     }
+    // const [dataTypes, setDataType] = useState(startingState) ;
+
+    // function handleChange(obj, index ){ // new obj state 
+
+    //     setObjects([...dataTypes], obj) ; 
     // }
-
-    // render(
-
-        // for (let blk = 1; blk < this.state.numBlocks; blk++) {
-        //     if (blk == 5) {
-        //         grid.push(<div class={"gridId "+"id-"+blk}><IndivBlock blockSize="focus" blockId = {blk} dataType = "focus"/></div>)
-        //     }else{
-        //     grid.push(<div class={"gridId "+"id-"+blk}><IndivBlock blockId = {blk} dataType = {blk%2 == 0 ? "text":"video"} /> </div>);
-        //     }  
-        // }
-
+     
     let id_num = 0 ; 
         return (
 
@@ -128,6 +67,45 @@ const GridInformation  = () => {
 
         ) ;
     }
-
-
 export default GridInformation ;
+    /*
+     ** Class information has been deprecated for functional component IndivBlock
+     ------------------------------------------------------------------------------
+    class InformationBlock extends React.Component {
+        constructor(props){
+            super(props);
+        
+
+        }
+
+        gridBlockSetUp(){
+            // Returns JSX setting up initial grid properties
+            if (this.props.dataType == "video"){
+                return(
+                <video width="320" height="220" controls>
+                    <source src='videos/output.mp4' type="video/mp4"></source>
+                </video>
+                )
+            }else if(this.props.blockSize == "focus"){
+                return (<p style={{fontSize:20}}> {this.props.dataType} </p> ) ;
+            }else{
+                return (<p style={{fontSize:10}}> {this.props.dataType} </p> ) ;
+            }
+        
+        }
+        
+        render(){
+            return (
+                <div class="grid-item" >
+                    
+                    {this.gridBlockSetUp()}
+                    {/* <p style={{fontSize:10}}> {this.props.blockId}</p> }
+                </div>
+            )   ;
+        }
+    }
+**/
+
+
+
+
