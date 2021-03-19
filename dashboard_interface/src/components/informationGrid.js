@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {useState} from 'react' ;
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 const IndivBlock = (props) => {
 
@@ -11,17 +12,27 @@ const IndivBlock = (props) => {
                 // Returns JSX setting up initial grid properties
                 if (props.dataType == "video"){
                     return(
+                    <div class={"gridId "+"id-"+props.blockId} style={{placeItems: 'center' / 'center'}}>
                     <video width="100%" height="100%" controls style={{backgroundSize: "100%"}}>
                         <source src='videos/output.mp4' type="video/mp4"></source>
                     </video>
+                    </div>
                     )
                 }else if(props.blockSize == "focus"){
                     return (<p style={{fontSize:20}}> {props.dataType} </p> ) ;
                 }else if(props.dataType == "text"){
-                    return (<div style={{}}>
-                            <p style={{fontSize:13}}> MotionDetected?:  </p> 
-                            <p style={{fontSize:13}}> Date:  </p> 
-                            <p style={{fontSize:13}}> Loc:  </p> 
+                    return (<div class={"gridId "+"id-"+props.blockId} style={{placeItems: 'start' / 'start'}}>
+                            
+                            
+                                    <ErrorOutlineIcon /> <p style={{fontSize:13}}> MotionDetected:  </p> 
+                                
+                        
+                                    <p style={{fontSize:13}}> Date:  </p> 
+                          
+                                    <p style={{fontSize:13}}> Loc:  </p> 
+                               
+                         
+                    
                             </div>
                         ) ;
                 }
@@ -31,7 +42,7 @@ const IndivBlock = (props) => {
     return (
             <>
                 {condRenderDatatype(props)}
-                <p style={{fontSize:10}}> {props.blockId}</p>
+                
             </>
         )   ;
 }
@@ -52,12 +63,11 @@ const GridInformation  = ({dataTypes}) => {
     let id_num = 0 ; 
         return (
 
-            <div class = "grid-wrapper" style={{placeItems: 'center' / 'center'}}>  
+            <div class = "grid-wrapper" >  
                 {dataTypes.map( (dataTypeInBlock, index) => (
-                        <div class={"gridId "+"id-"+index}>
+                        
                         <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index}  /> 
-                        </div>
-                    
+                        
                     )
                 )
                 }

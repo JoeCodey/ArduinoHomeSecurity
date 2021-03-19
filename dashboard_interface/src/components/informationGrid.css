@@ -13,8 +13,9 @@
 
   .gridId{
     display: grid;
-    justify-items: center;
-    align-items: center;
+    background-color: #ffd8a8;
+    color: #d9480f;
+    
   }
 
   .grid-wrapper {
