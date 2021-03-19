@@ -28,6 +28,7 @@ def success(name):
    return 'welcome %s' % name
 
 @app.route('/login',methods = ['POST', 'GET'])
+
 def login():
    if request.method == 'POST':
       user = request.form['nm']
@@ -55,6 +56,12 @@ def capture():
          with open(filename,'wb') as f:
             shutil.copyfileobj(r.raw,f) 
          return send_file(filename, mimetype='image/jpeg')
+
+def realtime_event_linsener():
+   """ Open a local socket over the network with a an 
+       ESP device to get events in real time"""
+
+
 
 
 
