@@ -10,12 +10,12 @@ const IndivBlock = (props) => {
 
     function condRenderDatatype(props){
                 // Returns JSX setting up initial grid properties
-                if (props.dataType == "video"){
+                if (props.dataType == "test_video"){
                     return(
                     <div class={"gridId "+"id-"+props.blockId} style={{placeItems: 'center' / 'center'}}>
-                    <video width="100%" height="100%" controls style={{backgroundSize: "100%"}}>
-                        <source src='videos/output.mp4' type="video/mp4"></source>
-                    </video>
+                        <video width="100%" height="100%" controls style={{backgroundSize: "100%"}}>
+                            <source src='videos/output.mp4' type="video/mp4"></source>
+                        </video>
                     </div>
                     )
                 }else if(props.blockSize == "focus"){
@@ -27,12 +27,12 @@ const IndivBlock = (props) => {
                                     <ErrorOutlineIcon /> <p style={{fontSize:13}}> MotionDetected:  </p> 
                                 
                         
-                                    <p style={{fontSize:13}}> Date:  </p> 
+                                    <p style={{fontSize:13}}> TimeStart / TimeEnd -> {props.metaData.timeStart} / {props.metaData.timeEnd}  </p> 
+                                    
+                                    {/* {console.log("Time props -> " + props.metaData.timeEnd)} */}
                           
-                                    <p style={{fontSize:13}}> Loc:  </p> 
-                               
-                         
-                    
+                                    <p style={{fontSize:13}}> Loc:  {props.metaData.location}</p> 
+                                
                             </div>
                         ) ;
                 }
@@ -42,7 +42,7 @@ const IndivBlock = (props) => {
     return (
             <>
                 {condRenderDatatype(props)}
-                
+               
             </>
         )   ;
 }
@@ -66,7 +66,7 @@ const GridInformation  = ({dataTypes}) => {
             <div class = "grid-wrapper" >  
                 {dataTypes.map( (dataTypeInBlock, index) => (
                         
-                        <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index}  /> 
+                        <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index} metaData = {dataTypeInBlock}   /> 
                         
                     )
                 )
