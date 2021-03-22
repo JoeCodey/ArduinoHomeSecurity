@@ -51,7 +51,7 @@ const IndivBlock = (props) => {
 const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 == 0 ? "text" : "video", data: " "}}), {})
 
 
-const GridInformation  = ({dataTypes}) => {
+const GridInformation  = (dataTypes) => {
 
     // const [dataTypes, setDataType] = useState(startingState) ;
 
@@ -64,6 +64,8 @@ const GridInformation  = ({dataTypes}) => {
         return (
 
             <div class = "grid-wrapper" >  
+            {console.log("dataTypes-> ")} 
+            {console.log(dataTypes)}
                 {dataTypes.map( (dataTypeInBlock, index) => (
                         
                         <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index} metaData = {dataTypeInBlock}   /> 

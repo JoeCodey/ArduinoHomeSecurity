@@ -15,21 +15,23 @@ function App() {
 
   // Fetch all blocks data (used initially) from server 
   const fetchBlocks = async () => {
-    const res = await fetch('http://localhost:5000/blockdata') 
+    const res = await fetch('http://localhost:8888/blockdata') 
     const data = await res.json() 
     return data ;   
   }
 
   // Fetch indiv block data from server 
   const fetchBlock = async (id) => {
-    const res = await fetch(`http://localhost:5000/blockdata/${id}`) 
+    const res = await fetch(`http://localhost:8888/blockdata/${id}`) 
     const data = await res.json() 
-    return data ;   
+    return res ;   
   }
 
   useEffect(() => {
     const getBlocks = async () => {
       const blocksFromServer = await fetchBlocks() ; 
+      console.log("dataReceived -> ")
+      console.log(blocksFromServer)
       setBlockData(blocksFromServer)
     }
     getBlocks()

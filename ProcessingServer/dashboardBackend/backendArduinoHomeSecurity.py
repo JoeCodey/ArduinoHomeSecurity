@@ -1,19 +1,26 @@
-from flask import Flask, redirect, url_for, request, send_file
+from flask import Flask, redirect, url_for, request, send_file, jsonify
+import flask_cors
 import requests , shutil 
 from io import BytesIO
 import datetime
 import wget
+import json 
 from queue import Queue
+# from UDP_SimpleServer import openUDPSocketWithESP
 
 
 
 app = Flask(__name__)
+
 ctx = app.test_request_context() 
 
 base_ESP_URL = "http://192.168.2.203"
 
 # queue to save 10 most recent pictures 
 q = Queue(maxsize=10)   
+with open('initialBlockData.json', 'r') as myfile:
+    data=myfile.read()
+blockData = json.loads(data)
 
 
 def gen_filename() : 
@@ -36,6 +43,18 @@ def login():
    else:
       user = request.args.get('nm')
       return redirect(url_for('success',name = user))
+
+@app.route('/blockdata',methods = ['POST', 'GET'])
+
+def getBlockData(id=None):
+   if id == None: 
+      
+      
+      return jsonify(blockData)
+   else: 
+      return "specific data"
+
+
 
 
 
@@ -60,13 +79,18 @@ def capture():
 def realtime_event_linsener():
    """ Open a local socket over the network with a an 
        ESP device to get events in real time"""
+   #openUDPSocketWithESP() 
 
-
-
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
 
 
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run(debug = True, port = 8888)
 
 def test1_capture(uri = "/capture"):
    url = base_ESP_URL + uri 
