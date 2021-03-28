@@ -10,18 +10,18 @@ const IndivBlock = (props) => {
 
     function condRenderDatatype(props){
                 // Returns JSX setting up initial grid properties
-                if (props.dataType == "test_video"){
+                if (props.dataType === "test_video"){
                     return(
-                    <div class={"gridId "+"id-"+props.blockId} style={{placeItems: 'center' / 'center'}}>
+                   
                         <video width="100%" height="100%" controls style={{backgroundSize: "100%"}}>
                             <source src='videos/output.mp4' type="video/mp4"></source>
                         </video>
-                    </div>
+         
                     )
-                }else if(props.blockSize == "focus"){
+                }else if(props.blockSize === "focus"){
                     return (<p style={{fontSize:20}}> {props.dataType} </p> ) ;
-                }else if(props.dataType == "text"){
-                    return (<div class={"gridId "+"id-"+props.blockId} style={{placeItems: 'start' / 'start'}}>
+                }else if(props.dataType === "text"){
+                    return (<>
                             
                             
                                     <ErrorOutlineIcon /> <p style={{fontSize:13}}> MotionDetected:  </p> 
@@ -32,49 +32,51 @@ const IndivBlock = (props) => {
                                     {/* {console.log("Time props -> " + props.metaData.timeEnd)} */}
                           
                                     <p style={{fontSize:13}}> Loc:  {props.metaData.location}</p> 
+
+                                    <style>{".id-"+props.blockId+"{place-items: start start}"}</style>
+                                    
                                 
-                            </div>
+                         </>
                         ) ;
                 }
                 
     }
 
     return (
-            <>
+        <div class={"gridId "+"id-"+props.blockId}>
                 {condRenderDatatype(props)}
-               
-            </>
+                <p style={{fontSize:10}}> {props.blockId}</p>
+        </div>
         )   ;
 }
 
 // Generate initial starting states for grid in the form of  { id  : {dataType: "type" , data: ""}}
-const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 == 0 ? "text" : "video", data: " "}}), {})
 
 
-const GridInformation  = (dataTypes) => {
 
-    // const [dataTypes, setDataType] = useState(startingState) ;
+const GridInformation  = ({dataTypes}) => {
+//    const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 == 0 ? "text" : "video", data: " "}}), {})
+//     const [gridCharac, setDataType] = useState([dataTypes]) ;
 
     // function handleChange(obj, index ){ // new obj state 
 
     //     setObjects([...dataTypes], obj) ; 
     // }
-     
+    // if (!gridCharac) {gridCharac = startingState } 
     let id_num = 0 ; 
         return (
-
             <div class = "grid-wrapper" >  
-            {console.log("dataTypes-> ")} 
-            {console.log(dataTypes)}
-                {dataTypes.map( (dataTypeInBlock, index) => (
+               
+                {
+                dataTypes.map( (dataTypeInBlock, index) => (
                         
-                        <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index} metaData = {dataTypeInBlock}   /> 
-                        
-                    )
-                )
+                       
+                         <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index} metaData = {dataTypeInBlock}   /> 
+                             
+                    ))
                 }
      
-                <style>{".id-1{grid-area: 2 / 2 / span 2 / span 2;}"}</style>
+                {/* <style>{".id-1{grid-area: 2 / 2 / span 2 / span 2;}"}</style> */}
             </div>
 
         ) ;

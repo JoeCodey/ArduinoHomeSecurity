@@ -5,9 +5,8 @@ import {useState, useEffect } from 'react' ;
 import './App.css';
 import './components/informationGrid.css' ;
 
-
-
-
+// Generate initial starting states for grid in the form of  { id  : {dataType: "type" , data: ""}}
+const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 === 0 ? "text" : "video", data: " "}}), {})
 
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
@@ -17,6 +16,7 @@ function App() {
   const fetchBlocks = async () => {
     const res = await fetch('http://localhost:8888/blockdata') 
     const data = await res.json() 
+
     return data ;   
   }
 
@@ -27,11 +27,13 @@ function App() {
     return res ;   
   }
 
+
   useEffect(() => {
     const getBlocks = async () => {
       const blocksFromServer = await fetchBlocks() ; 
-      console.log("dataReceived -> ")
-      console.log(blocksFromServer)
+          console.log("dataReceived -> ")
+          console.log(blocksFromServer)
+       
       setBlockData(blocksFromServer)
     }
     getBlocks()
@@ -39,6 +41,7 @@ function App() {
 
 
   return (
+
     <div className="App">
       <header className="App-header">
         {/* <img src={logo} className="App-logo" alt="logo" />
@@ -56,7 +59,10 @@ function App() {
         <h1>Active Information Dashboard
         </h1>
       </header>
+
       <div className="Grid-Layouts">
+        {console.log("blockdata->")}
+        {console.log(blockdata)}
         <GridInformation dataTypes={blockdata}/>
       </div>
     </div> 

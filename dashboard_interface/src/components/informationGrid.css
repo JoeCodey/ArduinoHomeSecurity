@@ -13,10 +13,12 @@
 
   .gridId{
     display: grid;
-    background-color: #ffd8a8;
-    color: #d9480f;
-    
+    justify-items: center;
+    align-items: center;
   }
+  
+
+  .id-1{grid-area: 2 / 2 / span 2 / span 2;}
 
   .grid-wrapper {
       border: 2px solid #f76707;

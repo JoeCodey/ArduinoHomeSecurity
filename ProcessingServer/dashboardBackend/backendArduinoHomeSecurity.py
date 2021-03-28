@@ -44,12 +44,10 @@ def login():
       user = request.args.get('nm')
       return redirect(url_for('success',name = user))
 
-@app.route('/blockdata',methods = ['POST', 'GET'])
+@app.route('/blockdata',methods = [ 'GET'])
 
 def getBlockData(id=None):
-   if id == None: 
-      
-      
+   if id == None:          
       return jsonify(blockData)
    else: 
       return "specific data"
