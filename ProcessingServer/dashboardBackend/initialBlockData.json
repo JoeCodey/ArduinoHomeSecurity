@@ -1,5 +1,5 @@
-{
-    "blockdata": [
+
+    [
         {
             "dataType": "text",
             "id": 0,
@@ -43,4 +43,4 @@
             "label": " "
         }
     ]
-}
+
