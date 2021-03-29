@@ -1,16 +1,31 @@
 import socket
 
-UDP_IP = "192.168.2.54"
-UDP_PORT = 5005
+UDP_IP = "192.168.2.12"
+UDP_PORT = 50000
 
-sock = socket.socket(socket.AF_INET, # Internet
+
+class realTimeEventDetector :
+    
+    def __init__(self, Host_IP="192.168.2.12", port="50000"):
+        self.Host_IP = Host_IP 
+        self.port = port
+        self.sock = None
+    
+    def start_and_bind(self):
+        self.sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
-sock.bind((UDP_IP, UDP_PORT))
+        self.sock.bind((UDP_IP, UDP_PORT))
 
-print("UDP Socket starting")
+    def closeConnection(self):
+        self.sock.close() 
 
-def openUDPSocketWithESP():
-    while True:
-        data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-        print('Data from ', addr)
-        print("received message:", data)
+    def begin(self):       
+        while True:
+            data, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
+            print('Data from ', addr)
+            print("received message:", data)
+   
+
+
+
+
