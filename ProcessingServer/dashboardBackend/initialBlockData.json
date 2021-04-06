@@ -1,46 +1,54 @@
+[
+    {
+        "dataType": "text",
+        "id": 0,
+        "label": " "
+    },
+    {
+        "dataType": "text",
+        "id": 1,
+        "label": " "
+    },
+    {
+        "dataType": "text",
+        "id": 2,
+        "label": " "
+    },
+    {
+        "dataType": "test_video",
+        "id": 3,
+        "label": " "
+    },
+    {
+        "dataType": "text",
+        "id": 4,
+        "label": " "
+    },
+    {
+        "dataType": "text",
+        "id": 5,
+        "eventId": 3,
+        "location": "entrance",
+        "timeEnd": "15:30:18:532",
+        "timeStart": "15:30:12:532"
+    },
 
-    [
-        {
-            "dataType": "text",
-            "id": 0,
-            "label": " "
-        },
-        {
-            "dataType": "text",
-            "id": 1,
-            "label": " "
-        },
-        {
-            "dataType": "text",
-            "id": 2,
-            "label": " "
-        },
-        {
-            "dataType": "test_video",
-            "id": 3,
-            "label": " "
-        },
-        {
-            "dataType": "text",
-            "id": 4,
-            "label": " "
-        },
-        {
-            "dataType": "text",
-            "id": 5,
-            "location": "entrance",
-            "timeEnd": "15:30:18:532",
-            "timeStart": "15:30:12:532"
-        },
-        {
-            "dataType": "text",
-            "id": 6,
-            "label": " "
-        },
-        {
-            "dataType": "test_video",
-            "id": 7,
-            "label": " "
-        }
-    ]
-
+    {
+        "dataType": "test_video",
+        "id": 7,
+        "label": " "
+    },
+    {
+        "dataType": "image",
+        "id": 7,
+        "label": " "
+    } ,
+       {
+        "dataType": "text&video", 
+        "id": 5,
+        "eventId": 3,
+        "location": "entrance",
+        "timeEnd": "15:30:18:532",
+        "timeStart": "15:30:12:532"
+    }
+]

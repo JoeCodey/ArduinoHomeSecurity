@@ -24,3 +24,7 @@ ProcessingServer/dashboardBackend/utput
 ProcessingServer/dashboardBackend/__pycache__/
 ProcessingServer/dashboardBackend/imageCache/
 
+ProcessingServer/dashboardBackend/newData.json
+ProcessingServer/dashboardBackend/initialBlockData.json
+
+dashboard_interface/public/testImageDashboard.jpg

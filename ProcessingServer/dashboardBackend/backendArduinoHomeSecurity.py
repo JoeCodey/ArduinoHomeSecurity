@@ -19,9 +19,7 @@ base_ESP_URL = "http://192.168.2.203"
 
 # queue to save 10 most recent pictures 
 q = Queue(maxsize=10)   
-with open('initialBlockData.json', 'r') as myfile:
-    data=myfile.read()
-blockData = json.loads(data)
+
 
 
 DIR = './imageCache'
@@ -46,6 +44,25 @@ def login():
 @app.route('/blockdata',methods = [ 'GET'])
 
 def getBlockData(id=None):
+   with open('initialBlockData.json', 'r') as myfile:
+    data=myfile.read()
+   blockData = json.loads(data)
+    
+   if id == None:          
+      return jsonify(blockData)
+   else: 
+      return "specifc data"
+
+@app.route('/newblockdata',methods = [ 'GET'])
+
+def getNewBlockData(id=None):
+   
+   with open('newData.json', 'r') as myfile:
+      print("Openning newData.json")
+      data=myfile.read()
+      
+   blockData = json.loads(data)
+    
    if id == None:          
       return jsonify(blockData)
    else: 
@@ -70,13 +87,18 @@ def capture():
             shutil.copyfileobj(r.raw,f) 
          return send_file(filename, mimetype='image/jpeg')
 
+
+
+
+
+@app.route('/motion',methods = ['POST', 'GET'])
 def realtime_event_linsener():
    """ Open a local socket over the network with a an 
        ESP device to get events in real time"""
-   events = realTimeEventDetector()
+   events = realTimeEventDetector(database='initialBlockData.json')
    events.start_and_bind() 
    events.begin() 
-   
+   startFlag = True 
 
 @app.after_request
 def after_request(response):
