@@ -19,7 +19,8 @@
         "@testing-library/user-event": "^7.2.1",
         "react": "^16.14.0",
         "react-dom": "^16.14.0",
-        "react-scripts": "4.0.3"
+        "react-scripts": "4.0.3",
+        "socket.io-client": "^4.0.0"
     },
     "devDependencies": {
         "json-server": "^0.16.3"

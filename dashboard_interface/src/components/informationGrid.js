@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {useState} from 'react' ;
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import MotionEvent from './motionEvent.js'
+import ArducamEventPair from './arducamEventPair.js' 
 
 const IndivBlock = (props) => {
 
@@ -21,23 +23,17 @@ const IndivBlock = (props) => {
                 }else if(props.blockSize === "focus"){
                     return (<p style={{fontSize:20}}> {props.dataType} </p> ) ;
                 }else if(props.dataType === "text"){
-                    return (<>
-                            
-                            
-                                    <ErrorOutlineIcon /> <p style={{fontSize:13}}> MotionDetected:  </p> 
-                                
-                        
-                                    <p style={{fontSize:13}}> TimeStart / TimeEnd -> {props.metaData.timeStart} / {props.metaData.timeEnd}  </p> 
-                                    
-                                    {/* {console.log("Time props -> " + props.metaData.timeEnd)} */}
-                          
-                                    <p style={{fontSize:13}}> Loc:  {props.metaData.location}</p> 
-
-                                    <style>{".id-"+props.blockId+"{place-items: start start}"}</style>
-                                    
-                                
-                         </>
+                    return (
+                            <MotionEvent metaData= {props.metaData}  />
                         ) ;
+                }else if(props.dataType === "text&video"){
+                    return (
+                            <ArducamEventPair metaData = {props.metaData} /> 
+                    )
+                }else if(props.dataType === "image"){
+                    return (
+                        <img width="100%" height="100%" src='testImageDashboard.jpg' type="img/jpg"></img>
+                    )
                 }
                 
     }
@@ -63,7 +59,17 @@ const GridInformation  = ({dataTypes}) => {
     //     setObjects([...dataTypes], obj) ; 
     // }
     // if (!gridCharac) {gridCharac = startingState } 
+
+    // useEffect(() => {
+    //     effect
+    //     return () => {
+    //         cleanup
+    //     }
+    // }, [input])
+    
+
     let id_num = 0 ; 
+    let lengthDatatypes = Object.keys(dataTypes).length -1; 
         return (
             <div class = "grid-wrapper" >  
                
@@ -72,11 +78,15 @@ const GridInformation  = ({dataTypes}) => {
                         
                        
                          <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index} metaData = {dataTypeInBlock}   /> 
-                             
+                        
+                        
+                         
+                         
+
                     ))
                 }
      
-                {/* <style>{".id-1{grid-area: 2 / 2 / span 2 / span 2;}"}</style> */}
+                <style>{".id-"+lengthDatatypes+"{grid-area: 2 / 2 / span 2 / span 2;}"}</style> 
             </div>
 
         ) ;
