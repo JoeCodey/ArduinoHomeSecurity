@@ -10,6 +10,8 @@ package-lock.json
 .DS_Store
 .AHS_backend
 .venv
+*.swp
+*.swo
 
 ProcessingServer/dashboardBackend/AHS_backend/
 ProcessingServer/dashboardBackend/15:11:51.712.jpg

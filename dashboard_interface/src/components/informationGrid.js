@@ -23,13 +23,14 @@ const IndivBlock = (props) => {
                 }else if(props.blockSize === "focus"){
                     return (<p style={{fontSize:20}}> {props.dataType} </p> ) ;
                 }else if(props.dataType === "text"){
+                    if(props.metaData.cameraData === 'yes'){
+                        return (
+                            <ArducamEventPair metaData = {props.metaData} imgId= {props.blockId} /> 
+                        );
+                    }
                     return (
-                            <MotionEvent metaData= {props.metaData}  />
+                            <MotionEvent metaData= {props.metaData}   />
                         ) ;
-                }else if(props.dataType === "text&video"){
-                    return (
-                            <ArducamEventPair metaData = {props.metaData} /> 
-                    )
                 }else if(props.dataType === "image"){
                     return (
                         <img width="100%" height="100%" src='testImageDashboard.jpg' type="img/jpg"></img>
