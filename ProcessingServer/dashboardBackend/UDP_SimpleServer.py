@@ -1,13 +1,21 @@
 import socket
 import datetime
 import json
+import threading, time
 from queue import Queue 
+from  ArduCam_Backend import isCameraAvail,runArduCam
 UDP_IP = "192.168.2.12"
 UDP_PORT = 50000
 
 def genTimeStamp():
     time = datetime.datetime.now().time().strftime('%H:%M:%S.%f') 
     return time[:-3] 
+
+def gen_filename() : 
+    filename = '.json'
+    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f')
+    filename = time[:-3] + filename
+    return filename
 
 def test1():
     sock = realTimeEventDetector() 
@@ -23,8 +31,6 @@ class realTimeEventDetector :
         self.eventlist = []
         self.espSensorType = espSensorType 
         
-        
-    
     def start_and_bind(self):
         self.sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
@@ -36,7 +42,8 @@ class realTimeEventDetector :
     def begin(self):       
         index = 0 
         json_data = {}
-        json_data['id'] = index 
+        
+        
         packetPair = (0,'','') # (packet_id, packet 1, packet 2)
         while not realTimeEventDetector.is_socket_closed(self.sock):
             
@@ -44,26 +51,36 @@ class realTimeEventDetector :
             print('Data from ', addr)
             print("received message:", data)
             data = data.decode('utf-8')
-            
-            # packetPair[0] = data[data.find(':')+1]
-            if(data.find('Detect')):
+            #packetID from esp, same id -> related packets, (eg Start,end)
+            packetId = data[data.find(':')+1]
+            # if('packetId' in json_data 
+            #    and json_data['packetId'] == packetId):
+            #     json_data['timeEnd'] = genTimeStamp()
+            if(data.find('Detect') >= 0 ):    
                 json_data['id'] = index 
+                json_data['packetId'] = packetId
                 json_data['dataType'] = self.espSensorType 
                 json_data['location'] = 'entrance' 
-                json_data['timeStart'] = genTimeStamp() 
-                # packetPair[0] = data
-                
-            if(data.find("Ended")):
+                json_data['timeStart'] = genTimeStamp()
+                #check if camera data is available 
+                if(isCameraAvail()):
+                    thread = threading.Thread(target=runArduCam, args= (index,123))
+                    thread.start()
+                    json_data["cameraData"] = 'yes'
+                          
+            if(data.find("Ended") >= 0 ):
+                print("truthyA %s" %(data.find('Ended')))
                 json_data['timeEnd'] = genTimeStamp() 
-
+                self.eventlist.append(json_data)
+                json_data = {}
+                index += 1 
+                with open("newData.json","w") as write_file:    
+                 json.dump(self.eventlist,write_file)
+                 
             
-            self.eventlist.append(json_data)
-            with open("newData.json","w") as write_file:    
-                json.dump(self.eventlist,write_file)
-            json_data = {}
              
-            print("socketClosed %s" % (realTimeEventDetector.is_socket_closed(self.sock))) 
-            index += 1 
+           # print("socketClosed %s" % (realTimeEventDetector.is_socket_closed(self.sock))) 
+            
             
             #----
             #flip switch every other packet to check for packet pairs (e.g. start and end of sensor event)
@@ -88,6 +105,5 @@ class realTimeEventDetector :
 
    
 
-exit
 
 

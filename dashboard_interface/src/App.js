@@ -41,11 +41,12 @@ function App() {
       setBlockData(blocksFromServer)
   }
     getBlocks()
-    // const timer = setInterval(async () => {
-    //     const data = await fetchnewData()
-    //     {console.log(data)}
-    //     setBlockData(data)
-    // },8000)
+
+    const timer = setInterval(async () => {
+        const data = await fetchnewData()
+        {console.log(data)}
+        setBlockData(data)
+    },3000)
   }, [])
 
   return (

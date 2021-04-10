@@ -25,6 +25,11 @@ q = Queue(maxsize=10)
 DIR = './imageCache'
 cached_images = [name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
 
+def gen_filename() : 
+    filename = '.jpg'
+    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f')
+    filename = time[:-3] + filename
+    return filename
 
 
 @app.route('/success/<name>')
@@ -58,7 +63,6 @@ def getBlockData(id=None):
 def getNewBlockData(id=None):
    
    with open('newData.json', 'r') as myfile:
-      print("Openning newData.json")
       data=myfile.read()
       
    blockData = json.loads(data)
@@ -68,24 +72,44 @@ def getNewBlockData(id=None):
    else: 
       return "specifc data"
 
+@app.route('/getImage',methods = ['POST', 'GET'])
+def getCameraimage():
+   data = request.args.get("id")
+   filename = "./imageCache/"+data + ".jpg"
+
+   with open(filename,'r') as f:
+    return send_file(filename, mimetype='image/jpeg')
+
+
 @app.route('/capture',methods = ['POST', 'GET'])
 def capture():
    """ Get a captured image from ESP12-E camera """
 
    uri = '/capture'
    url = base_ESP_URL + uri 
-   filename = "./imageCache/"+gen_filename() 
+   filename = "./imageCache/"+ gen_filename() 
    r  = requests.get(url, stream = True ) 
    if r.status_code == 200 : 
       print("********\nresponse status code : %d\n********\n" % r.status_code )
       r.raw.decode_content = True 
-      if q.full() : q.get() # remove oldest image from storage 
+      if q.full() : 
+         file = q.get()
+         os.remove(file) # remove oldest image from storage 
       if not q.full() :
          print(q.qsize())
          q.put(filename)
          with open(filename,'wb') as f:
             shutil.copyfileobj(r.raw,f) 
          return send_file(filename, mimetype='image/jpeg')
+
+@app.route('/capture_test',methods = ['POST', 'GET'])
+def capture_test():
+   """ Get a captured image from ESP12-E camera """
+
+  
+   filename = './imageCache/20:25:09.378.jpg'
+   with open(filename,'r') as f:
+    return send_file(filename, mimetype='image/jpeg')
 
 
 
@@ -111,11 +135,7 @@ def after_request(response):
 if __name__ == '__main__':
    app.run(debug = True, port = 8888)
 
-def gen_filename() : 
-    filename = '.jpg'
-    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f')
-    filename = time[:-3] + filename
-    return filename
+
 
 
 def test1_capture(uri = "/capture"):
