@@ -117,10 +117,10 @@ def realtime_event_linsener():
 @app.after_request
 def after_request(response):
    """Tells Browswer to Allow CORS from flask requests"""
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-    return response
+   response.headers.add('Access-Control-Allow-Origin', '*')
+   response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+   response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+   return response
 
 
 if __name__ == '__main__':

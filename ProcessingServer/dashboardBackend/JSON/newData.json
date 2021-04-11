@@ -1,0 +1,22 @@
+[{
+    "id": 0,
+    "packetId": "1",
+    "dataType": "text",
+    "location": "entrance",
+    "timeStart": "13:23:05.959",
+    "timeEnd": "13:23:05.959"
+}, {
+    "id": 1,
+    "packetId": "2",
+    "dataType": "text",
+    "location": "entrance",
+    "timeStart": "13:23:11.290",
+    "timeEnd": "13:23:11.290"
+}, {
+    "id": 2,
+    "packetId": "2",
+    "dataType": "text",
+    "location": "entrance",
+    "timeStart": "13:23:17.351",
+    "timeEnd": "13:23:17.351"
+}]
