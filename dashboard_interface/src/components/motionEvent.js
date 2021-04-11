@@ -10,9 +10,7 @@ const MotionEvent = (props) => {
     } = props.metaData
 
 
-    return (<>
-                            
-                            
+    return (<>                        
          <p style={{fontSize:13 , position: "relative" , top: '2px'}}> <ErrorOutlineIcon /> MotionDetected:  </p> 
 
         <p style={{fontSize:13, marginBottom:0}}>
@@ -21,8 +19,6 @@ const MotionEvent = (props) => {
         <p style={{fontSize:13, margin:0 , paddingTop:0}}>
             {props.metaData.timeStart} / {props.metaData.timeEnd}
         </p>
-
-
         
         {/* {console.log("Time props -> " + props.metaData.timeEnd)} */}
 

@@ -6,6 +6,10 @@ import {
 import MotionEvent from './motionEvent.js'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+const flaskBackendAddress = 'http://localhost:8888'
+
+
+// Custom Hook for loading image from backend 
 export const useImage = (src) => {
     const [hasLoaded, setHasLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
@@ -16,7 +20,7 @@ export const useImage = (src) => {
         setHasLoaded(false);
         setHasError(false);
 
-        // Here's where the magic happens.
+        
         const image = new Image();
         image.src = src;
 
@@ -46,52 +50,24 @@ const ArducamEventPair = (props) => {
         timeStart,
         timeEnd,
         location,
-        arducamImage
+        arducamImage // Will use if one decides to store imagepath in database
     } = props
 
-    const d = new Date ; 
-    const imageURL =  "http://localhost:8888/getImage?id=" + props.imgId
+    const imageURL =  `${flaskBackendAddress}/getImage?id=${props.imgId}`
     
     let {hasLoaded, hasError} = useImage(imageURL) ;
 
-    // const fetchImage = async() => {
-    //      const res = await fetch('http://localhost:8888/capture')
-    //      return res.blob()
-    //     }
-
-    // useEffect(() => {
-    //     const getImage = async () => { 
-    //     const img_arduCam = await fetchImage()
-    //     setState(img_arduCam) 
-    //     }
-    //     getImage() 
-    // },[])   
-
-   
 
 
     return ( 
-        <>
-          
+        <>      
            <MotionEvent metaData= {props.metaData} />
-           
-            
             {!hasLoaded && <CircularProgress />}
             {hasLoaded && <img height="100%" style={{maxWidth: '500px', width: '100%'}} src={imageURL} />}
-           
-    
 
         </>
 
-
-
-
     );
-
-
-
-
-
 }
 
 export default ArducamEventPair;

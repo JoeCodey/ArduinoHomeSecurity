@@ -4,23 +4,9 @@ import json
 import threading, time
 from queue import Queue 
 from  ArduCam_Backend import isCameraAvail,runArduCam
+from ToolsAndTests import genTimeStamp
 UDP_IP = "192.168.2.12"
 UDP_PORT = 50000
-
-def genTimeStamp():
-    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f') 
-    return time[:-3] 
-
-def gen_filename() : 
-    filename = '.json'
-    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f')
-    filename = time[:-3] + filename
-    return filename
-
-def test1():
-    sock = realTimeEventDetector() 
-    sock.start_and_bind() 
-    sock.begin() 
 
 class realTimeEventDetector :
     
@@ -74,7 +60,7 @@ class realTimeEventDetector :
                 self.eventlist.append(json_data)
                 json_data = {}
                 index += 1 
-                with open("newData.json","w") as write_file:    
+                with open("./JSON/newData.json","w") as write_file:    
                  json.dump(self.eventlist,write_file)
                  
             
@@ -104,6 +90,9 @@ class realTimeEventDetector :
         return False
 
    
-
+def test_startSocket():
+    sock = realTimeEventDetector() 
+    sock.start_and_bind() 
+    sock.begin() 
 
 
