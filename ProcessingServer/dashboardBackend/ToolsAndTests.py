@@ -1,4 +1,6 @@
 
+import datetime
+
 def gen_filename(extension='.jpg') : 
     """Generates filename with current time. \n
     Provide extension to change default '.jpg' \n

@@ -1,3 +1,6 @@
 [submodule "esp12Eas_Sensor-Server"]
 	path = esp12Eas_Sensor-Server
 	url = https://github.com/JoeCodey/esp12Eas_Sensor-Server
+[submodule "ArduCamImagesOverESP8266"]
+	path = ArduCamImagesOverESP8266
+	url = git@github.com:JoeCodey/ArduCamImagesOverESP8266.git
