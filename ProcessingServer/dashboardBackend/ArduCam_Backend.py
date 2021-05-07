@@ -27,10 +27,7 @@ class ArduCamBackend:
                     shutil.copyfileobj(r.raw,f)
                 
 def runArduCam(_id,blank):
-    print(_id)
-    print(type(_id))
-    cam = ArduCamBackend()
-    
+    cam = ArduCamBackend()    
     cam.get_image_event_synced(_id)
 
 
