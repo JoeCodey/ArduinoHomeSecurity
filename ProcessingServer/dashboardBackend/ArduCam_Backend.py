@@ -25,10 +25,15 @@ class ArduCamBackend:
                 r.raw.decode_content = True 
                 with open(image_name,'wb') as f:
                     shutil.copyfileobj(r.raw,f)
+    def write_image_to_db(): 
+        
+    
+    
                 
 def runArduCam(_id,blank):
     cam = ArduCamBackend()    
     cam.get_image_event_synced(_id)
+
 
 
 

@@ -42,6 +42,8 @@ class MyCassandraDatabase:
        querry = 'INSERT INTO eventtable JSON \'' + new_json_row + "';"
        print(querry)
        self.session.execute(querry)
+    
+   
 
    def deleteRow(self,_id):
         query = "Delete from eventtable where event_id = %s " % (_id)
@@ -60,6 +62,13 @@ class MyCassandraDatabase:
     timeStart text,
     timeEnd text
     );""")
+ 
+ 
+   def getRowById(self,_id):
+       query = "select JSON* from eventtable where event_id=%d ;" % (_id)
+       res = self.session.execute(query)
+       return res
+
 
    def displayTableContents(self): 
         ''' Display all event table contents (FOR TESTING) ''' 
@@ -85,4 +94,10 @@ def test_insertJSON() :
     cass.insertJSON(data) 
     cass.displayTableContents()
     cass.deleteRow(unique_id) 
+
+def test_getRowJSON() : 
+    cass = MyCassandraDatabase.getInstance() 
+    res = cass.getRowById(0)
+    print(res.one())
+    
     

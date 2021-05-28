@@ -1,5 +1,6 @@
 
 import datetime
+import uuid 
 
 def gen_filename(extension='.jpg') : 
     """Generates filename with current time. \n
@@ -13,6 +14,9 @@ def gen_filename(extension='.jpg') :
 def genTimeStamp():
     time = datetime.datetime.now().time().strftime('%H:%M:%S.%f') 
     return time[:-3] 
+
+def getUniqueId():
+    return str(uuid.uuid4().fields[-1])[:5] 
 
 #--- Tests ----- 
 def test1_capture(uri = "/capture"):

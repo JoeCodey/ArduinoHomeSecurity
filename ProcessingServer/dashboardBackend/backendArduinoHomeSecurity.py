@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, request, send_file, jsonify
 import flask_cors
 import requests , shutil 
+import threading, time 
 from io import BytesIO
 import os
 import json , datetime
@@ -31,9 +32,11 @@ cached_images = [name for name in os.listdir(DIR) if os.path.isfile(os.path.join
 db = MyCassandraDatabase.getInstance() 
 
 #Start realTimeEventSocket to talk to ESP8266 devices
-esp_event_sock = realTimeEventSocket(database=db) 
-esp_event_sock.start_and_bind() 
-esp_event_sock.begin() 
+
+# esp_event_sock = realTimeEventSocket(database=db) 
+# esp_event_sock.start_and_bind() 
+
+# thread_realtime_event_socket = threading.Thread(target=esp_event_sock.begin(),args() 
 
 # TODO: .begin() call blocks flask backend from starting ... create new thread?
 

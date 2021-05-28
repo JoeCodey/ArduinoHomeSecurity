@@ -1,1 +1,29 @@
-[{"event_id": 0, "packet_id": "5", "dataType": "text", "location": "entrance", "timeStart": "14:08:46.279", "timeEnd": "14:08:52.010"}, {"event_id": 1, "packet_id": "0", "dataType": "text", "location": "entrance", "timeStart": "14:08:55.303", "timeEnd": "14:09:01.023"}, {"event_id": 2, "packet_id": "1", "dataType": "text", "location": "entrance", "timeStart": "14:09:13.309", "timeEnd": "14:09:18.842"}, {"event_id": 3, "packet_id": "2", "dataType": "text", "location": "entrance", "timeStart": "14:09:27.685", "timeEnd": "14:09:33.586"}, {"event_id": 4, "packet_id": "3", "dataType": "text", "location": "entrance", "timeStart": "14:09:36.451", "timeEnd": "14:09:42.161"}, {"event_id": 5, "packet_id": "4", "dataType": "text", "location": "entrance", "timeStart": "14:09:45.101", "timeEnd": "14:09:50.936"}]
+[
+    {
+        "timeEnd": "14:06:57.055"
+    },
+    {
+        "dataType": "text",
+        "event_id": 1,
+        "location": "entrance",
+        "packet_id": "4",
+        "timeEnd": "14:07:07.356",
+        "timeStart": "14:07:01.521"
+    },
+    {
+        "dataType": "text",
+        "event_id": 2,
+        "location": "entrance",
+        "packet_id": "5",
+        "timeEnd": "14:07:16.511",
+        "timeStart": "14:07:10.740"
+    },
+    {
+        "dataType": "text",
+        "event_id": 3,
+        "location": "entrance",
+        "packet_id": "0",
+        "timeEnd": "14:07:33.673",
+        "timeStart": "14:07:27.958"
+    }
+]
