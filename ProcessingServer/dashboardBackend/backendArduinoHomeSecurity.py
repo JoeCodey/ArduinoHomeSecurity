@@ -1,14 +1,17 @@
 from flask import Flask, redirect, url_for, request, send_file, jsonify
 import flask_cors
 import requests , shutil 
+import threading, time 
 from io import BytesIO
 import os
 import json , datetime
 from queue import Queue
 #From project
-from UDP_SimpleServer import realTimeEventDetector
+from database.cassandra_connection import MyCassandraDatabase 
+from UDP_SimpleServer import realTimeEventSocket
 from ArduCam_Backend import base_ArduCam_IP
 from ToolsAndTests import gen_filename
+
 
 
 
@@ -24,7 +27,20 @@ q = Queue(maxsize=10)
 DIR = './imageCache'
 cached_images = [name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
 
+#Start Cassandra Database and check connection 
 
+db = MyCassandraDatabase.getInstance() 
+
+#Start realTimeEventSocket to talk to ESP8266 devices
+
+# esp_event_sock = realTimeEventSocket(database=db) 
+# esp_event_sock.start_and_bind() 
+
+# thread_realtime_event_socket = threading.Thread(target=esp_event_sock.begin(),args() 
+
+# TODO: .begin() call blocks flask backend from starting ... create new thread?
+
+print("Bro I think .begin() blocks everything ?!?!?")
 
 @app.route('/login',methods = ['POST', 'GET'])
 #TODO: add login functionality 
@@ -109,7 +125,7 @@ def capture_test():
 def realtime_event_linsener():
    """ Open a local socket over the network with a an 
        ESP device to get events in real time"""
-   events = realTimeEventDetector(database='initialBlockData.json')
+   events = realTimeEventSocket(database='initialBlockData.json')
    events.start_and_bind() 
    events.begin() 
    startFlag = True 
