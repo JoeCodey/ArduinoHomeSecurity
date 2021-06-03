@@ -22,6 +22,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+#node_modules , run npm install to download via package.json 
+node_modules
+
 #testResources
 /tests/*
 
