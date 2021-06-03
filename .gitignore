@@ -13,7 +13,7 @@ package-lock.json
 *.swp
 *.swo
 
-ProcessingServer/dashboardBackend/ahs_py_bend/
+ProcessingServer/dashboardBackend/.AHS_backend/
 ProcessingServer/dashboardBackend/15:11:51.712.jpg
 ProcessingServer/dashboardBackend/15:13:18.918.jpg
 ProcessingServer/dashboardBackend/15:15:45.618.jpg
@@ -30,5 +30,6 @@ ProcessingServer/dashboardBackend/newData.json
 ProcessingServer/dashboardBackend/initialBlockData.json
 
 dashboard_interface/public/testImageDashboard.jpg
+dashboard_interface/node_modules/
 ProcessingServer/dashboardBackend/JSON/newData.json
 /Users/josephlefebvre/ArduinoHomeSecurity/ProcessingServer/dashboardBackend/ahs_py_bend/*
