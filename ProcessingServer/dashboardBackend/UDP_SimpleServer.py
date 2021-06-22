@@ -29,7 +29,7 @@ class realTimeEventSocket :
         # Dump dictionary object into string 
         json_string = json.dumps(data)
         self.database.insertJSON(json_string)
-    
+
     def begin(self):       
         index = 0 
         json_data = {}        
@@ -53,17 +53,17 @@ class realTimeEventSocket :
                 #check if camera data is available        
                 # TODO: # isCameraAvail cannot check it r.status_code == 200 if camera is off. 
                 # Simply waits for request to timeout while blocking code '''
-                if(isCameraAvail()):
-                    thread = threading.Thread(target=runArduCam, args= (event_id,123))
-                    thread.start()
-                    json_data["imagePath"] = "./imageCache" + str(event_id)
-                    json_data["cameraData"] = 'yes'
+                # if(isCameraAvail()):
+                #     thread = threading.Thread(target=runArduCam, args= (event_id,123))
+                #     thread.start()
+                #     json_data["imagePath"] = "./imageCache" + str(event_id)
+                #     json_data["cameraData"] = 'yes'
                           
             if(data.find("Ended") >= 0 ):
                 json_data['timeEnd'] = genTimeStamp()         
                 if ('timeStart' in json_data):
                     # write data to cassandra 
-                    self.write_db(json_data) 
+                    #self.write_db(json_data) 
                     #write to array to store in JSON file 
                     self.eventlist.append(json_data)
                 json_data = {}

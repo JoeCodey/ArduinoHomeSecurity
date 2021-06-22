@@ -43,8 +43,6 @@ class MyCassandraDatabase:
        print(querry)
        self.session.execute(querry)
     
-   
-
    def deleteRow(self,_id):
         query = "Delete from eventtable where event_id = %s " % (_id)
         self.session.execute(query)
