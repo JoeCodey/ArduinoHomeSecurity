@@ -14,7 +14,6 @@ from ToolsAndTests import gen_filename
 
 
 
-
 app = Flask(__name__)
 
 ctx = app.test_request_context() 
@@ -24,12 +23,13 @@ q = Queue(maxsize=10)
 
 
 #generates list of all files names in image directory
-DIR = './imageCache'
-cached_images = [name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
+# DIR = './imageCache'
+# cached_images = [name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
 
 #Start Cassandra Database and check connection 
 
 db = MyCassandraDatabase.getInstance() 
+
 
 #Start realTimeEventSocket to talk to ESP8266 devices
 
@@ -50,6 +50,7 @@ def login():
       return redirect(url_for('success',name = user))
    else:
       user = request.args.get('nm')
+
       return redirect(url_for('success',name = user))
 
 @app.route('/blockdata',methods = [ 'GET'])
@@ -140,7 +141,7 @@ def after_request(response):
 
 
 if __name__ == '__main__':
-   app.run(debug = True, port = 8888)
+   app.run(debug = False, port = 8888)
 
 
 
