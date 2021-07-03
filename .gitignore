@@ -1,5 +1,4 @@
 node_modules
-ArduinoUnit/Joe*
 ArduinoUnit/ArduCam
 ArduinoUnit/libraries
 ArduinoUnit/SetUpTests
@@ -33,3 +32,6 @@ dashboard_interface/public/testImageDashboard.jpg
 dashboard_interface/node_modules/
 ProcessingServer/dashboardBackend/JSON/newData.json
 /Users/josephlefebvre/ArduinoHomeSecurity/ProcessingServer/dashboardBackend/ahs_py_bend/*
+cassDoc.command
+ProcessingServer/dashboardBackend/database/__pycache__/*
+

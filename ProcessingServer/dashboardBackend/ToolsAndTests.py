@@ -3,45 +3,47 @@ import datetime
 from unittest.case import TestCase
 import uuid 
 import os 
+import json 
 
 #import Cassandra Db backend 
 from database.cassandra_connection import MyCassandraDatabase 
 
 def getUniqueId():
-    return str(uuid.uuid4().fields[-1])[:5] 
+    return int(str(uuid.uuid4().fields[-1])[:5] )
 class TestCassDb(unittest.TestCase):
 
     __db = None 
 
     def test_coldstart(self):
-        '''Tests if application can recover from a coldstart of the db'''
+        '''\nTests if application can recover from a coldstart of the db'''
         TestCassDb.__db = MyCassandraDatabase.getInstance() 
         
-        self.assertIsNotNone(TestCassDb.__db,"Failed MyCassDb instance was not assigned")
+        self.assertIsNotNone(TestCassDb.__db," MyCassDb instance was not assigned")
+        
     
-    def test_displayTable(self):
-        TestCassDb.__db.displayTableContents() 
-
-
-
+    def test_connect_and_ping(self): 
+        cass = MyCassandraDatabase.getInstance()
+        cass.displayTableContents()
+        
+        
     def test_crud(self):
-        '''Test CRUD functionality of Cassandra db''' 
+        '''\nTest CRUD functionality of Cassandra db''' 
         _uuid = getUniqueId()
-        test_row = "INSERT INTO EventTable(event_id,packedId,dataType,timeStart,timeEnd) \
-        VALUES("+_uuid+",0,'text','15:30:12:532','15:30:18:532');"
-        test_json = '{"dataType": "text&video", \
-        "event_id": %s, \
-        "packet_id": 3, \
-        "location": "entrance", \
-        "timeEnd": "15:30:18:532", \
-        "timeStart": "15:30:12:532" }' % (_uuid)
-        TestCassDb.__db.insertJSON(test_json)
-        res = TestCassDb.__db.getRowById(_uuid)
-        print(res)
-        self.assertEqual(1,1,"bleh")
+        test_json = {}
+        test_json['event_id'] = _uuid 
+        test_json['datatype'] = "text&video"
+        test_json['location'] = 'entrance'
+        test_json['packet_id'] = 3 
+        test_json['timeend'] = "15:30:18:532"
+        test_json['timestart'] = "15:30:12:532"
+        TestCassDb.__db.insertJSON(json.dumps(test_json))
+        res = TestCassDb.__db.getRowById_JSON(_uuid)
+        res = json.loads(res)
+        TestCassDb.__db.deleteRow(_uuid)
+        self.assertDictEqual(test_json,res,"Test-json data does not match Db query result")
 
 if __name__ == '__main__':
-    unittest.main() 
+    unittest.main(verbosity=2,)
 
 
 def gen_filename(extension='.jpg') : 
