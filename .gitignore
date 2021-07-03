@@ -31,7 +31,7 @@ ProcessingServer/dashboardBackend/initialBlockData.json
 dashboard_interface/public/testImageDashboard.jpg
 dashboard_interface/node_modules/
 ProcessingServer/dashboardBackend/JSON/newData.json
-/Users/josephlefebvre/ArduinoHomeSecurity/ProcessingServer/dashboardBackend/ahs_py_bend/*
+ProcessingServer/dashboardBackend/ahs_py_bend/*
 cassDoc.command
-ProcessingServer/dashboardBackend/database/__pycache__/*
-
+ProcessingServer/dashboardBackend/database/__pycache__/
+ProcessingServer/dashboardBackend/database/__pycache__/
