@@ -43,11 +43,10 @@ class TestCassDb(unittest.TestCase):
         self.assertDictEqual(test_json,res,"Test-json data does not match Db query result")
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2,)
+    unittest.main(verbosity=2)
 
 def run_db_unittest():
-    suite = unittest.TestLoader().loadTestsFromModule(TestCassDb)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    return unittest.defaultTestLoader
 
 
 def gen_filename(extension='.jpg') : 

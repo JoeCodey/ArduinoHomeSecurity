@@ -25,6 +25,7 @@ class MyCassandraDatabase:
         except Exception as e:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
+            print("ERROR ->\n -- % -- \n\n" %(e))
       return MyCassandraDatabase.__instance
    
    def __init__(self):
@@ -97,16 +98,18 @@ class MyCassandraDatabase:
     event_id int PRIMARY KEY,
     packet_id int,
     dataType text,
-    location text,
-    timeStart text,
+    location text,o
+    timeStart text,o
     timeEnd text
     );""")
-
+   def query_all_json(self):
+       query = 'select JSON* from eventtable'
+       res = self.session.execute(query)
+       return res.one().json
  
    def getRowById_JSON(self,_id):
        query = "select JSON* from eventtable where event_id=%s ;" % (_id)
        res = self.session.execute(query)
-
        return res.one().json
 
 

@@ -1,3 +1,4 @@
+
 from flask import Flask, redirect, url_for, request, send_file, jsonify
 import flask_cors
 import requests , shutil 
@@ -6,11 +7,13 @@ from io import BytesIO
 import os
 import json , datetime
 from queue import Queue
+import unittest 
 #From project
 from database.cassandra_connection import MyCassandraDatabase 
 from UDP_SimpleServer import realTimeEventSocket
 from ArduCam_Backend import base_ArduCam_IP
-from ToolsAndTests import gen_filename
+from tools_and_tests import gen_filename
+from tools_and_tests import TestCassDb
 
 
 
@@ -21,7 +24,6 @@ ctx = app.test_request_context()
 # queue to save 10 most recent pictures 
 q = Queue(maxsize=10)   
 
-
 #generates list of all files names in image directory
 # DIR = './imageCache'
 # cached_images = [name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]
@@ -29,18 +31,16 @@ q = Queue(maxsize=10)
 #Start Cassandra Database and check connection 
 
 db = MyCassandraDatabase.getInstance() 
-
+print("Cass Db instance -> %s " % (type(db)))
 
 #Start realTimeEventSocket to talk to ESP8266 devices
-
-# esp_event_sock = realTimeEventSocket(database=db) 
-# esp_event_sock.start_and_bind() 
-
-# thread_realtime_event_socket = threading.Thread(target=esp_event_sock.begin(),args() 
-
-# TODO: .begin() call blocks flask backend from starting ... create new thread?
-
-print("Bro I think .begin() blocks everything ?!?!?")
+esp8266_event_socket = realTimeEventSocket(database = db)
+print("... Starting ESP socket ...")
+esp8266_event_socket.start_and_bind()
+# (Complete) TODO: .begin() call blocks flask backend from starting ... create new thread?
+# *** start_and_bind() is blocking on Fail 
+thread_event_socket = threading.Thread(target=esp8266_event_socket.begin())
+thread_event_socket.start()
 
 @app.route('/login',methods = ['POST', 'GET'])
 #TODO: add login functionality 
@@ -70,10 +70,12 @@ def getBlockData(id=None):
 def getNewBlockData(id=None):
    """Get most up to data from file \n
    UDP_SimpleServer populates file with ESP12-E events """
-   with open('./JSON/newData.json', 'r') as myfile:
-      data=myfile.read()
-      
-   blockData = json.loads(data)
+   if db == None:
+      with open('./JSON/newData.json', 'r') as myfile:
+         data=myfile.read()
+   else:
+      data = db.query_all_json()
+      blockData = json.loads(data)
     
    if id == None:          
       return jsonify(blockData)
@@ -141,7 +143,7 @@ def after_request(response):
 
 
 if __name__ == '__main__':
-   app.run(debug = False, port = 8888)
+   app.run(debug = True, port = 8888)
 
 
 
