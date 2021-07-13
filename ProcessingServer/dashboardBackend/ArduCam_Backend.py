@@ -1,6 +1,6 @@
 import requests , shutil
 import threading, time 
-
+import subprocess
 
 base_ArduCam_IP = "http://192.168.2.203"
 
@@ -8,6 +8,7 @@ def isCameraAvail(base_IP = base_ArduCam_IP):
         'uri for arducam software, sends image over network for HTTP'
         uri_arducam = base_IP + '/capture' 
         r = requests.get(uri_arducam)
+        print("-- blocked --")
         return r.status_code == 200 
 
 class ArduCamBackend:
@@ -36,14 +37,18 @@ def runArduCam(_id,blank):
 
 
 
-
-
-          
-
-
 def test_isCameraAvail(): 
     returned_value = isCameraAvail(base_ArduCam_IP)
     print(returned_value)
 
-
+def run_network_scan():
+    for ping in range(1,10):
+        address = base_ArduCam_IP
+        res = subprocess.call(['ping', '-c', '3', address])
+        if res == 0:
+            print( "ping to", address, "OK")
+        elif res == 2:
+            print("no response from", address)
+        else:
+            print("ping to", address, "failed!")
 

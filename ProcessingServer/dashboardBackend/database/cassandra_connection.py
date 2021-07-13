@@ -1,6 +1,7 @@
 import datetime as dt
 import os
 import sys, time 
+import json 
 from datetime import date, timedelta
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import uuid #great tool for generating unique IDs 
@@ -25,6 +26,7 @@ class MyCassandraDatabase:
         except Exception as e:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
+            print("ERROR ->\n -- % -- \n\n" %(e))
       return MyCassandraDatabase.__instance
    
    def __init__(self):
@@ -97,16 +99,23 @@ class MyCassandraDatabase:
     event_id int PRIMARY KEY,
     packet_id int,
     dataType text,
-    location text,
-    timeStart text,
+    location text,o
+    timeStart text,o
     timeEnd text
     );""")
-
+   def query_all_json(self):
+       ''' Returns all entries as Cassandra Result Set object'''
+       query = 'select JSON* from eventtable'
+       res_set = self.session.execute(query)
+       res_json_arr = []
+       for row in res_set:
+           json_elem = json.loads(row.json)
+           res_json_arr.append(json_elem)
+       return res_json_arr
  
    def getRowById_JSON(self,_id):
        query = "select JSON* from eventtable where event_id=%s ;" % (_id)
        res = self.session.execute(query)
-
        return res.one().json
 
 
