@@ -35,3 +35,4 @@ ProcessingServer/dashboardBackend/ahs_py_bend/*
 cassDoc.command
 ProcessingServer/dashboardBackend/database/__pycache__/
 ProcessingServer/dashboardBackend/database/__pycache__/
+ProcessingServer/dashboardBackend/udp_serv.command

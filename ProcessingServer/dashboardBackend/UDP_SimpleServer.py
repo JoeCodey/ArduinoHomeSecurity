@@ -4,7 +4,7 @@ import json
 import threading, time
 from queue import Queue 
 from  ArduCam_Backend import isCameraAvail,runArduCam
-from ToolsAndTests import genTimeStamp, getUniqueId
+from tools_and_tests import genTimeStamp, getUniqueId
 UDP_IP = "192.168.2.12"
 UDP_PORT = 50000
 
@@ -40,7 +40,9 @@ class realTimeEventSocket :
         json_data = {}        
         packetPair = (0,'','') # (packet_id, packet 1, packet 2)
         while not realTimeEventSocket().is_socket_closed(self.sock):     
+            
             data, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
+           
             data = data.decode('utf-8')
             print("Data -> %s" % (data))
             #packetID from esp, same id -> related packets, (eg Start,end)

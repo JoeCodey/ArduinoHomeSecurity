@@ -1,3 +1,4 @@
+
 import unittest
 import datetime
 from unittest.case import TestCase
@@ -23,7 +24,7 @@ class TestCassDb(unittest.TestCase):
     
     def test_connect_and_ping(self): 
         cass = MyCassandraDatabase.getInstance()
-        cass.displayTableContents()
+        #cass.displayTableContents()
         
         
     def test_crud(self):
@@ -41,6 +42,19 @@ class TestCassDb(unittest.TestCase):
         res = json.loads(res)
         TestCassDb.__db.deleteRow(_uuid)
         self.assertDictEqual(test_json,res,"Test-json data does not match Db query result")
+
+    def test_query_all_json(self):
+        ''' test MyCassandraDatabase method to query results in JSON output\n'''
+        result_set = TestCassDb.__db.query_all_json().all()
+        result_arr = []
+        #print("Raw results set : \n%s\n" %(result_set.all()))
+        for row in result_set : 
+            dict_item = json.loads(row.json)
+            result_arr.append(dict_item) 
+            #print("\nA row -> %s | %s \n" % (row.json,type(row)))
+            #print("\t str(row) -> %s | %s \n " % (str(row.json),type(str(row.json))))
+        #print(result_arr)
+        return result_arr
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

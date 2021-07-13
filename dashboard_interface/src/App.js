@@ -43,6 +43,7 @@ function App() {
     // (Currently this sample static data to test frontent rendernig)
     const getBlocks = async () => {
       const blocksFromServer = await fetchBlocks() ; 
+      {console.log("testBlockData -> " , blocksFromServer)}
       setBlockData(blocksFromServer)
   }
     getBlocks()
@@ -51,7 +52,7 @@ function App() {
     // with realtime Web Socket Connection 
     const timer = setInterval(async () => {
         const data = await fetchnewData()
-        {console.log(data)}
+        {console.log("newBlockData -> " , data)}
         setBlockData(data)
     },3000)
   }, [])

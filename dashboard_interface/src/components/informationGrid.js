@@ -6,6 +6,8 @@ import ArducamEventPair from './arducamEventPair.js'
 
 const IndivBlock = (props) => {
 
+    
+
     const [dataType, setDataType] = useState({dataType: "text"})
 
     function updateState (newState) { setDataType({newState})} 
@@ -48,14 +50,15 @@ const IndivBlock = (props) => {
 // Generate initial starting states for grid in the form of  { id  : {dataType: "type" , data: ""}}
 
 const GridInformation  = ({dataTypes}) => {
-
+    
     let id_num = 0 ; 
     let lengthDatatypes = Object.keys(dataTypes).length -1; 
         return (
             <div class = "grid-wrapper" >  
                 {
                 dataTypes.map( (dataTypeInBlock, index) => (
-                         <IndivBlock dataType= {dataTypeInBlock.dataType} blockId= {index} metaData = {dataTypeInBlock}   /> 
+                        // object produced by Cassandra db is only lower-case ... yet JS object indexing is case sensite .dataType != .datatype
+                         <IndivBlock dataType= {dataTypeInBlock.datatype} blockId= {index} metaData = {dataTypeInBlock}   /> 
                     ))
                 }
                 <style>{".id-"+lengthDatatypes+"{grid-area: 2 / 2 / span 2 / span 2;}"}</style> 

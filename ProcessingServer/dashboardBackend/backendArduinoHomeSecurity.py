@@ -15,8 +15,6 @@ from ArduCam_Backend import base_ArduCam_IP
 from tools_and_tests import gen_filename
 from tools_and_tests import TestCassDb
 
-
-
 app = Flask(__name__)
 
 ctx = app.test_request_context() 
@@ -39,8 +37,13 @@ print("... Starting ESP socket ...")
 esp8266_event_socket.start_and_bind()
 # (Complete) TODO: .begin() call blocks flask backend from starting ... create new thread?
 # *** start_and_bind() is blocking on Fail 
-thread_event_socket = threading.Thread(target=esp8266_event_socket.begin())
-thread_event_socket.start()
+_cwd = os.getcwd() 
+cmd_start_socket = '''echo "cd %s; source ./.AHS_backend/bin/activate; python UDP_SimpleServer.py ; " \
+   > udp_serv.command; chmod +x udp_serv.command; open udp_serv.command''' %(_cwd)
+os.system(cmd_start_socket)
+
+# thread_event_socket = threading.Thread(target=esp8266_event_socket.begin())
+# thread_event_socket.start()
 
 @app.route('/login',methods = ['POST', 'GET'])
 #TODO: add login functionality 
@@ -75,10 +78,10 @@ def getNewBlockData(id=None):
          data=myfile.read()
    else:
       data = db.query_all_json()
-      blockData = json.loads(data)
+      
     
    if id == None:          
-      return jsonify(blockData)
+      return jsonify(data)
    else: 
       return "specifc data"
 
