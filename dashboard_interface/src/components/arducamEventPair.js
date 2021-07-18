@@ -46,15 +46,11 @@ export const useImage = (src) => {
 };
 
 const ArducamEventPair = (props) => {
-     const {
-        event_id,
-        timeStart,
-        timeEnd,
-        location,
-        arducamImage // Will use if one decides to store imagepath in database
-    } = props
+     
 
-    const imageURL =  `${flaskBackendAddress}/getImage?id=${props.event_id}`
+    const imageURL =  `${flaskBackendAddress}/getImage?id=${props.imgId}`
+    console.log("prop arducampair -> ",props)
+    console.log("imageURL -> ",imageURL)
     
     let {hasLoaded, hasError} = useImage(imageURL) ;
 

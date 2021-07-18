@@ -23,9 +23,9 @@ const IndivBlock = (props) => {
                 }else if(props.blockSize === "focus"){
                     return (<p style={{fontSize:20}}> {props.dataType} </p> ) ;
                 }else if(props.dataType === "text"){
-                    if(props.metaData.cameraData === 'yes'){
+                    if(props.metaData.cameradata === 'yes'){
                         return (
-                            <ArducamEventPair metaData = {props.metaData} imgId= {props.blockId} /> 
+                            <ArducamEventPair metaData = {props.metaData} imgId= {props.metaData.event_id} /> 
                         );
                     }
                     return (

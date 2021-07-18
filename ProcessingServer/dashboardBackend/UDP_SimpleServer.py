@@ -3,14 +3,17 @@ import datetime
 import json
 import threading, time
 from queue import Queue 
+from colorama import Fore, Back, Style
 from  ArduCam_Backend import isCameraAvail,runArduCam
-from tools_and_tests import genTimeStamp, getUniqueId
+from tools_and_tests import genTimeStamp, getUniqueId, ping_address
+from database.cassandra_connection import MyCassandraDatabase 
 UDP_IP = "192.168.2.12"
+get_host_ip_cmd = 'ifconfig | grep "inet " | grep -v 127.0.0.1'
 UDP_PORT = 50000
 
 class realTimeEventSocket :
     
-    def __init__(self, database =None, Host_IP="192.168.2.12", port="50000", espSensorType='text'):
+    def __init__(self, database =None, Host_IP=UDP_IP, port=50000, espSensorType='text'):
         self.Host_IP = Host_IP 
         self.port = port
         self.database = database 
@@ -23,9 +26,12 @@ class realTimeEventSocket :
         try:
             self.sock = socket.socket(socket.AF_INET, # Internet
                         socket.SOCK_DGRAM) # UDP
-            self.sock.bind((UDP_IP, UDP_PORT))
+            self.sock.bind((self.Host_IP, self.port))
+            print(Fore.GREEN + "Sock open @ -> " + str(self.sock.getsockname()), Style.RESET_ALL)
+            
         except Exception as e: 
-            print("Start_and_bind says -> Exceptions: %s" % (str(e)))
+            print(Fore.LIGHTRED_EX + Back.LIGHTWHITE_EX + "Start_and_bind says -> Exceptions: %s" % (str(e)), Style.RESET_ALL)
+            
 
     def closeConnection(self):
         self.sock.close() 
@@ -46,31 +52,32 @@ class realTimeEventSocket :
             data = data.decode('utf-8')
             print("Data -> %s" % (data))
             #packetID from esp, same id -> related packets, (eg Start,end)
-            packetId = data[data.find(':')+1]
+            #TODO: packets from ESP are not sending ':' before packet_id
+            #packetId = data[data.find(':')+1]
             # if('packetId' in json_data 
             #    and json_data['packetId'] == packetId):
             #     json_data['timeEnd'] = genTimeStamp()
             if(data.find('Detect') >= 0 ):   
                 event_id = int(getUniqueId()) 
                 json_data['event_id'] = event_id
-                json_data['packet_id'] = packetId
+                #json_data['packet_id'] = packetId
                 json_data['dataType'] = self.espSensorType 
                 json_data['location'] = 'entrance' 
                 json_data['timeStart'] = genTimeStamp()
                 #check if camera data is available        
                 # TODO: # isCameraAvail cannot check it r.status_code == 200 if camera is off. 
                 # Simply waits for request to timeout while blocking code '''
-                # if(isCameraAvail()):
-                #     thread = threading.Thread(target=runArduCam, args= (event_id,123))
-                #     thread.start()
-                #     json_data["imagePath"] = "./imageCache" + str(event_id)
-                #     json_data["cameraData"] = 'yes'
+                if(isCameraAvail()):
+                    thread = threading.Thread(target=runArduCam, args= (event_id,123))
+                    thread.start()
+                    json_data["imagePath"] = "./imageCache/" + str(event_id) + ".jpg"
+                    json_data["cameraData"] = 'yes'
                           
             if(data.find("Ended") >= 0 ):
                 json_data['timeEnd'] = genTimeStamp()         
                 if ('timeStart' in json_data):
                     # write data to cassandra 
-                    self.write_db(json_data) 
+                    self.database.insertJSON(json_data) 
                     #write to array to store in JSON file 
                     self.eventlist.append(json_data)
                 json_data = {}
@@ -96,10 +103,12 @@ class realTimeEventSocket :
             return False
         return False
 
-   
-def test_startSocket():
-    sock = realTimeEventSocket() 
+def start_socket():
+    cassandra_db = MyCassandraDatabase.getInstance()
+    print(Fore.GREEN + "Cass Db instance -> %s " % (type(cassandra_db)))
+    sock = realTimeEventSocket(database=cassandra_db) 
     sock.start_and_bind() 
     sock.begin() 
 
-
+if __name__ == '__main__':
+    start_socket()

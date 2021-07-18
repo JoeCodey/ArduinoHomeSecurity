@@ -1,10 +1,12 @@
 
+import subprocess
 import unittest
 import datetime
 from unittest.case import TestCase
 import uuid 
 import os 
 import json 
+import subprocess
 
 #import Cassandra Db backend 
 from database.cassandra_connection import MyCassandraDatabase 
@@ -61,6 +63,15 @@ if __name__ == '__main__':
 
 def run_db_unittest():
     return unittest.defaultTestLoader
+def ping_address(addr):
+    res = subprocess.call(['ping', '-q','-c', '3', addr])
+    if res == 0:
+        print( "ping to", addr, "OK")
+    elif res == 2:
+        print("no response from", addr)
+    else:
+        print("ping to", addr, "failed!")
+
 
 
 def gen_filename(extension='.jpg') : 
