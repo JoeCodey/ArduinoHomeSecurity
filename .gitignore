@@ -36,3 +36,4 @@ cassDoc.command
 ProcessingServer/dashboardBackend/database/__pycache__/
 ProcessingServer/dashboardBackend/database/__pycache__/
 ProcessingServer/dashboardBackend/udp_serv.command
+udp_serv.command

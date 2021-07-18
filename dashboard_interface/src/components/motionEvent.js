@@ -4,8 +4,8 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 const MotionEvent = (props) => {
 
     const {
-        timeStart,
-        timeEnd,
+        timestart,
+        timeend,
         location
     } = props.metaData
 
@@ -17,10 +17,10 @@ const MotionEvent = (props) => {
             TimeStart / TimeEnd 
         </p>
         <p style={{fontSize:13, margin:0 , paddingTop:0}}>
-            {props.metaData.timeStart} / {props.metaData.timeEnd}
+            {props.metaData.timestart} / {props.metaData.timeend}
         </p>
         
-        {/* {console.log("Time props -> " + props.metaData.timeEnd)} */}
+        {/* {console.log("Time props -> " + props.metaData.timeend)} */}
 
         <p style={{fontSize:13}}> Loc:  {props.metaData.location}</p> 
 

@@ -8,6 +8,7 @@ import uuid #great tool for generating unique IDs
 from cassandra.cluster import Cluster 
 
 
+
 def getUniqueId():
     return str(uuid.uuid4().fields[-1])[:5] 
 
@@ -83,12 +84,21 @@ class MyCassandraDatabase:
     
    def insertJSON(self,new_json_row):
        ''' Insert row given JSON ''' 
+       if type(new_json_row) == dict:
+           new_json_row = json.dumps(new_json_row)
        querry = 'INSERT INTO eventtable JSON \'' + new_json_row + "';"
        self.session.execute(querry)
     
    def deleteRow(self,_id):
         query = "Delete from eventtable where event_id = %s " % (_id)
         self.session.execute(query)
+   def deleteAll(self):
+       query = 'select JSON* from eventtable'
+       res_set = self.session.execute(query)
+       for row in res_set:
+           json_elem = json.loads(row.json)
+           self.deleteRow(json_elem['event_id'])
+        
 
    def insertTestRow():
     return "INSERT INTO EventTable(event_id,packedId,dataType,timeStart,timeEnd) \
@@ -99,9 +109,11 @@ class MyCassandraDatabase:
     event_id int PRIMARY KEY,
     packet_id int,
     dataType text,
-    location text,o
-    timeStart text,o
-    timeEnd text
+    location text,
+    timeStart text,
+    timeEnd text,
+    imagepath text,
+    cameradata text
     );""")
    def query_all_json(self):
        ''' Returns all entries as Cassandra Result Set object'''
