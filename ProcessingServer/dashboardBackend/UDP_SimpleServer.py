@@ -1,4 +1,4 @@
-import socket
+import socket,platform
 import datetime
 import json
 import threading, time
@@ -7,26 +7,32 @@ from colorama import Fore, Back, Style
 from  ArduCam_Backend import isCameraAvail,runArduCam
 from tools_and_tests import genTimeStamp, getUniqueId, ping_address
 from database.cassandra_connection import MyCassandraDatabase 
-UDP_IP = "192.168.2.12"
-get_host_ip_cmd = 'ifconfig | grep "inet " | grep -v 127.0.0.1'
+
+
+if platform.system() == 'Darwin':
+    UDP_IP = "192.168.2.12"
+elif platform.system() == 'Linux':
+    UDP_IP = socket.gethostbyname(socket.gethostname())
+
 UDP_PORT = 50000
 
 class realTimeEventSocket :
     
-    def __init__(self, database =None, Host_IP=UDP_IP, port=50000, espSensorType='text'):
-        self.Host_IP = Host_IP 
+    def __init__(self, database =None, host_IP=UDP_IP, port=50000, espSensorType='text'):
+        self.host_IP = host_IP 
         self.port = port
         self.database = database 
         self.sock = None
         self.eventlist = []
         self.espSensorType = espSensorType 
         
-    def start_and_bind(self):
+    def start_and_bind(self):       
         # TODO FIX: If IP address is unavailble, code execution is blocked 
         try:
+            print(Fore.YELLOW +"Attempting to bind (%s,%s)" %(self.host_IP,self.port))
             self.sock = socket.socket(socket.AF_INET, # Internet
                         socket.SOCK_DGRAM) # UDP
-            self.sock.bind((self.Host_IP, self.port))
+            self.sock.bind((self.host_IP, self.port))
             print(Fore.GREEN + "Sock open @ -> " + str(self.sock.getsockname()), Style.RESET_ALL)
             
         except Exception as e: 
@@ -104,6 +110,7 @@ class realTimeEventSocket :
         return False
 
 def start_socket():
+    print(Fore.YELLOW+"... Executing start_socket() procedure ... ")
     cassandra_db = MyCassandraDatabase.getInstance()
     print(Fore.GREEN + "Cass Db instance -> %s " % (type(cassandra_db)))
     sock = realTimeEventSocket(database=cassandra_db) 

@@ -9,7 +9,8 @@ import json , datetime
 from queue import Queue
 import unittest 
 #From project
-from database.cassandra_connection import MyCassandraDatabase 
+from database.cassandra_connection import MyCassandraDatabase
+from UDP_SimpleServer import start_socket
 from ArduCam_Backend import base_ArduCam_IP
 from tools_and_tests import gen_filename
 from tools_and_tests import TestCassDb
@@ -19,7 +20,7 @@ app = Flask(__name__)
 ctx = app.test_request_context() 
 
 # queue to save 10 most recent pictures 
-q = Queue(maxsize=10)   
+q = Queue(maxsize=11)   
 
 #generates list of all files names in image directory
 # DIR = './imageCache'
@@ -28,22 +29,21 @@ q = Queue(maxsize=10)
 #Start Cassandra Database and check connection 
 
 db = MyCassandraDatabase.getInstance() 
-print("Cass Db instance -> %s " % (type(db)))
+print("Cass Db instance -> %s " % (type(db)))   
 
 #Start realTimeEventSocket to talk to ESP8266 devices
 
-print("... Starting ESP socket ...")
+print("... Starting ESP sockdet ...")
 # (Complete) TODO: .begin() call blocks flask backend from starting ... create new thread?
 # *** start_and_bind() is blocking on Fail 
-_cwd = os.getcwd() 
-cmd_start_socket = '''echo "cd %s; source ./.AHS_backend/bin/activate; python UDP_SimpleServer.py ; " \
-   > udp_serv.command; chmod +x udp_serv.command; open udp_serv.command''' %(_cwd)
-os.system(cmd_start_socket)
+# _cwd = os.getcwd() 
+# cmd_start_socket = '''echo "cd %s; source ./.AHS_backend/bin/activate; python3 UDP_SimpleServer.py ; " \
+#    > udp_serv.command; chmod +x udp_serv.command; exec udp_serv.command''' %(_cwd)
+# os.system(cmd_start_socket)
 
-# esp8266_event_socket = realTimeEventSocket(database = db)
-# esp8266_event_socket.start_and_bind()
-# thread_event_socket = threading.Thread(target=threaded_socket(),args=(db,))
+# thread_event_socket = threading.Thread(target=start_socket())
 # thread_event_socket.start()
+
 
 @app.route('/login',methods = ['POST', 'GET'])
 #TODO: add login functionality 
@@ -56,10 +56,16 @@ def login():
 
       return redirect(url_for('success',name = user))
 
+@app.route('/')
+def hello():
+    print('/root')
+    return 'Hello World'
+
 @app.route('/blockdata',methods = [ 'GET'])
 def getBlockData(id=None):
    """Get initial sample data \n 
    This is used to test front end  """
+   print("/blockdata")
    with open('initialBlockData.json', 'r') as myfile:
     data=myfile.read()
    blockData = json.loads(data)
@@ -146,7 +152,8 @@ def after_request(response):
 
 
 if __name__ == '__main__':
-   app.run(debug = False, port = 8888)
+   print("... Attempting to run Flask app ... ")
+   app.run(debug = True, port = 8888)
 
 
 

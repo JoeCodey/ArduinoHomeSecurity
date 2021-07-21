@@ -8,7 +8,13 @@ import { ContactlessOutlined } from '@material-ui/icons';
 
 // Generate initial starting states for grid in the form of  { id  : {dataType: "type" , data: ""}}
 const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 === 0 ? "text" : "video", data: " "}}), {})
-const flaskBackendAddress = 'http://localhost:8888'
+/* Must address flask backend as if outside the docker network (e.g. on the host machine)
+ * ... because we are making requests from the browser, which is not in the docker network
+ * Although curl requests from inside the frontent docker container 
+ *  can use the docker network e.g. http://backend:$(port)/...
+ *  */ 
+
+const flaskBackendAddress = 'http://127.0.0.1:5000/'
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
   const [blockdata, setBlockData] = useState([] ) ; 
