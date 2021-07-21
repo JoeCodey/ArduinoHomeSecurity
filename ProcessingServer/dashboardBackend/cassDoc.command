@@ -1,1 +1,1 @@
-cd /Users/josephlefebvre/ArduinoHomeSecurity/ProcessingServer/dashboardBackend/database; docker-compose up; echo DONE! 
+cd /usr/src/app/database; docker-compose up; echo DONE! 
