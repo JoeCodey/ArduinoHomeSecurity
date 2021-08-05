@@ -37,3 +37,7 @@ ProcessingServer/dashboardBackend/database/__pycache__/
 ProcessingServer/dashboardBackend/database/__pycache__/
 ProcessingServer/dashboardBackend/udp_serv.command
 udp_serv.command
+ProcessingServer/dashboardBackend/database/__init__.pyc
+.gitignore
+.gitignore
+.gitignore
