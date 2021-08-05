@@ -1,5 +1,5 @@
 import datetime as dt
-import os
+import os,platform
 import sys, time 
 import json 
 from datetime import date, timedelta
@@ -7,7 +7,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import uuid #great tool for generating unique IDs 
 from cassandra.cluster import Cluster 
 
-
+if platform.system() == 'Darwin':
+    Cass_IP = '0.0.0.0'
+elif platform.system() == 'Linux':
+    Cass_IP = 'cas1'
 
 def getUniqueId():
     return str(uuid.uuid4().fields[-1])[:5] 
@@ -67,7 +70,7 @@ class MyCassandraDatabase:
 
    def connectToCluster(self): 
 
-    self.cluster = Cluster(['172.21.0.1'],port=9042)
+    self.cluster = Cluster([Cass_IP],port=9042)
     self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
     self.db_online = True
@@ -160,8 +163,6 @@ def test_insertJSON() :
 def test_getRowJSON() : 
     cass = MyCassandraDatabase.getInstance() 
     res = cass.getRowById()
-    
-    
     print(res.one())
     
     

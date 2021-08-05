@@ -6,6 +6,8 @@ services:
         image: cassandra:latest
         volumes:
             - /var/lib/cassandra/data
+        expose: 
+            - 5555
         ports:
             - 9042:9042
         environment:
@@ -13,6 +15,7 @@ services:
             - CASSANDRA_CLUSTER_NAME=MyCluster
             - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
             - CASSANDRA_DC=datacenter1
+
     cas2:
         container_name: cas2
         image: cassandra:latest
@@ -29,14 +32,15 @@ services:
             - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
             - CASSANDRA_DC=datacenter1
             - CASSANDRA_SEEDS=cas1
+            
     backend:
         build: ./ProcessingServer/dashboardBackend
         expose:
             - 8888
         ports: 
-            - 5000:8888
-            - 7500:7500
-            - 192.168.2.12:50000:50000
+            - 127.0.0.1:5000:8888
+            - 192.168.2.12:50000:5000/udp
+
         depends_on: 
             - cas1 
         
@@ -47,6 +51,7 @@ services:
             - FLASK_APP=backendArduinoHomeSecurity.py 
             - FLASK_DEBUG=true
             - CASSANDRA_HOST=cas1 
+            - HOST_IP=host.docker.internal
             
     frontend: 
         build: ./dashboard_interface

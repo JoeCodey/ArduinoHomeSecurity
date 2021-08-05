@@ -41,8 +41,8 @@ print("... Starting ESP sockdet ...")
 #    > udp_serv.command; chmod +x udp_serv.command; exec udp_serv.command''' %(_cwd)
 # os.system(cmd_start_socket)
 
-# thread_event_socket = threading.Thread(target=start_socket())
-# thread_event_socket.start()
+thread_event_socket = threading.Thread(target=start_socket)
+thread_event_socket.start()
 
 
 @app.route('/login',methods = ['POST', 'GET'])

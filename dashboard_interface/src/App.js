@@ -14,7 +14,7 @@ const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...obj
  *  can use the docker network e.g. http://backend:$(port)/...
  *  */ 
 
-const flaskBackendAddress = 'http://127.0.0.1:5000/'
+const flaskBackendAddress = 'http://localhost:5000/'
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
   const [blockdata, setBlockData] = useState([] ) ; 
