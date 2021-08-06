@@ -39,3 +39,7 @@ ProcessingServer/dashboardBackend/udp_serv.command
 udp_serv.command
 *.pyc
 ProcessingServer/dashboardBackend/JSON/newData.json
+ProcessingServer/dashboardBackend/database/__init__.pyc
+.gitignore
+.gitignore
+.gitignore
