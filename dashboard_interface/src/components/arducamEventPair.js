@@ -6,7 +6,8 @@ import {
 import MotionEvent from './motionEvent.js'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-const flaskBackendAddress = 'http://localhost:8888'
+// 127.0.0.1 addresses docker container from the outside (e.g. the browser)
+const flaskBackendAddress = 'http://localhost:5000'
 
 
 // Custom Hook for loading image from backend 

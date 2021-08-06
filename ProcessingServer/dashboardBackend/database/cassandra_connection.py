@@ -1,5 +1,5 @@
 import datetime as dt
-import os
+import os,platform
 import sys, time 
 import json 
 from datetime import date, timedelta
@@ -7,7 +7,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import uuid #great tool for generating unique IDs 
 from cassandra.cluster import Cluster 
 
-
+if platform.system() == 'Darwin':
+    Cass_IP = '0.0.0.0'
+elif platform.system() == 'Linux':
+    Cass_IP = 'cas1'
 
 def getUniqueId():
     return str(uuid.uuid4().fields[-1])[:5] 
@@ -27,7 +30,7 @@ class MyCassandraDatabase:
         except Exception as e:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
-            print("ERROR ->\n -- % -- \n\n" %(e))
+            print("ERROR ->\n -- %s -- \n\n" %(e))
       return MyCassandraDatabase.__instance
    
    def __init__(self):
@@ -37,6 +40,7 @@ class MyCassandraDatabase:
       else:
          self.db_online = False
          MyCassandraDatabase.__instance = self
+         
          try:
             self.connectToCluster()
          except Exception as e:
@@ -66,7 +70,7 @@ class MyCassandraDatabase:
 
    def connectToCluster(self): 
 
-    self.cluster = Cluster(['0.0.0.0'],port=9042)
+    self.cluster = Cluster([Cass_IP],port=9042)
     self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
     self.db_online = True
@@ -79,7 +83,7 @@ class MyCassandraDatabase:
         if index > 0: 
             self.session.execute("CREATE KEYSPACE ahs_event_db \
             WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};")
-            self.session.execute(self.createEventTable())
+            self.session.execute(self.createEventTable(self))
     
     
    def insertJSON(self,new_json_row):
@@ -100,11 +104,11 @@ class MyCassandraDatabase:
            self.deleteRow(json_elem['event_id'])
         
 
-   def insertTestRow():
-    return "INSERT INTO EventTable(event_id,packedId,dataType,timeStart,timeEnd) \
+   def insertTestRow(self):
+    return "INSERT INTO EventTable(event_id,packet_Id,dataType,timeStart,timeEnd) \
         VALUES("+getUniqueId()+",0,'text','15:30:12:532','15:30:18:532');"
 
-   def createEventTable():
+   def createEventTable(self):
         return ("""CREATE TABLE eventtable(
     event_id int PRIMARY KEY,
     packet_id int,
@@ -139,12 +143,12 @@ class MyCassandraDatabase:
             print(row.event_id,row.datatype,row.timeend)
 
 def test_connect_and_ping(): 
-    cass = MyCassandraDatabase().getInstance()
+    cass = MyCassandraDatabase.getInstance()
     cass.displayTableContents()
     return cass
 
 def test_insertJSON() : 
-    cass = MyCassandraDatabase()
+    cass = MyCassandraDatabase.getInstance()
     unique_id = getUniqueId()
     data = '{"dataType": "text&video", \
     "event_id": %s, \
@@ -159,8 +163,6 @@ def test_insertJSON() :
 def test_getRowJSON() : 
     cass = MyCassandraDatabase.getInstance() 
     res = cass.getRowById()
-    
-    
     print(res.one())
     
     
