@@ -40,7 +40,6 @@ class realTimeEventSocket :
         except Exception as e: 
             print(Fore.LIGHTRED_EX + Back.LIGHTWHITE_EX + "Start_and_bind says -> Exceptions: %s" % (str(e)), Style.RESET_ALL)
             
-
     def closeConnection(self):
         self.sock.close() 
     def write_db(self,data):
@@ -52,29 +51,20 @@ class realTimeEventSocket :
     def begin(self):       
         index = 0 
         json_data = {}        
-        packetPair = (0,'','') # (packet_id, packet 1, packet 2)
+        
         while not realTimeEventSocket().is_socket_closed(self.sock):     
             
             data, addr = self.sock.recvfrom(1024) # buffer size is 1024 bytes
            
             data = data.decode('utf-8')
             print("Data -> %s" % (data))
-            #packetID from esp, same id -> related packets, (eg Start,end)
-            #TODO: packets from ESP are not sending ':' before packet_id
-            #packetId = data[data.find(':')+1]
-            # if('packetId' in json_data 
-            #    and json_data['packetId'] == packetId):
-            #     json_data['timeEnd'] = genTimeStamp()
             if(data.find('Detect') >= 0 ):   
                 event_id = int(getUniqueId()) 
                 json_data['event_id'] = event_id
-                #json_data['packet_id'] = packetId
                 json_data['dataType'] = self.espSensorType 
                 json_data['location'] = 'entrance' 
                 json_data['timeStart'] = genTimeStamp()
                 #check if camera data is available        
-                # TODO: # isCameraAvail cannot check it r.status_code == 200 if camera is off. 
-                # Simply waits for request to timeout while blocking code '''
                 if(isCameraAvail()):
                     thread = threading.Thread(target=runArduCam, args= (event_id,123))
                     thread.start()
@@ -115,10 +105,8 @@ class realTimeEventSocket :
 
 def start_socket(_host_IP=UDP_IP):
     print(Fore.YELLOW+"... Executing start_socket() procedure ... ")
-    
+    # Get reference to Cassandra Db
     cassandra_db = MyCassandraDatabase.getInstance()
-    
-     
     print(Fore.GREEN + "Cass Db instance -> %s " % (type(cassandra_db)), Style.RESET_ALL)
     sock = realTimeEventSocket(database=cassandra_db,host_IP=_host_IP) 
     sock.start_and_bind() 

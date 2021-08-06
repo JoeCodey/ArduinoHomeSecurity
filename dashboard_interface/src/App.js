@@ -15,6 +15,7 @@ const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...obj
  *  */ 
 
 const flaskBackendAddress = 'http://localhost:5000/'
+
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
   const [blockdata, setBlockData] = useState([] ) ; 
@@ -48,7 +49,7 @@ function App() {
     // Get initial data 
     // (Currently this sample static data to test frontent rendernig)
     const getBlocks = async () => {
-      const blocksFromServer = await fetchBlocks() ; 
+      const blocksFromServer = await fetchnewData() ; 
       {console.log("testBlockData -> " , blocksFromServer)}
       setBlockData(blocksFromServer)
   }
