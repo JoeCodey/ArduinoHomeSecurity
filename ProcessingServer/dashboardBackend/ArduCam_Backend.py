@@ -3,19 +3,6 @@ import threading, time
 import subprocess
 
 base_ArduCam_IP = "192.168.2.203"
-
-def isCameraAvail(base_IP = base_ArduCam_IP):
-        'Check if arduCam is online and responsive (status : 200)\ \n**Send Ip address only w/out paths'
-        uri_arducam = "http://" + base_IP + '/capture'
-        try: 
-            res = subprocess.call(['ping','-q','-c','1',base_IP])
-            if res == 0 :
-                req = requests.get(uri_arducam)
-            return True if res==0 and req.status_code==200 else False     
-        except Exception as e: 
-            print("isCameraAvail() says -> %s" %(str(e)))
-        
-
 class ArduCamBackend:
     def __init__(self,ip = base_ArduCam_IP):
         self.base_ip = ip
@@ -33,7 +20,19 @@ class ArduCamBackend:
                     shutil.copyfileobj(r.raw,f)
     def write_image_to_db(): 
         return 0 
-    
+
+def isCameraAvail(base_IP = base_ArduCam_IP):
+        """Check if arduCam is online and responsive (status : 200)\ 
+        \n**Ping Ip address w/out paths to test responsiveness """
+        uri_arducam = "http://" + base_IP + '/capture'
+        try: 
+            res = subprocess.call(['ping','-q','-c','1',base_IP])
+            if res == 0 :
+                req = requests.get(uri_arducam)
+            return True if res==0 and req.status_code==200 else False     
+        except Exception as e: 
+            print("isCameraAvail() says -> %s" %(str(e)))    
+
 def runArduCam(_id,blank):
     cam = ArduCamBackend()    
     cam.get_image_event_synced(_id)
@@ -43,7 +42,8 @@ def test_isCameraAvail():
     print(returned_value)
 
 def run_network_scan():
-    for ping in range(1,10):
+    addresses_of_interest = ["192.168.2.42",base_ArduCam_IP]
+    for ping in addresses_of_interest:
         address = base_ArduCam_IP
         res = subprocess.call(['ping', '-c', '3', address])
         if res == 0:

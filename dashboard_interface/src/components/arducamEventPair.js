@@ -8,7 +8,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 // 127.0.0.1 addresses docker container from the outside (e.g. the browser)
 const flaskBackendAddress = 'http://localhost:5000'
-
+var incrementer = 0 
 
 // Custom Hook for loading image from backend 
 export const useImage = (src) => {
@@ -52,6 +52,8 @@ const ArducamEventPair = (props) => {
     const imageURL =  `${flaskBackendAddress}/getImage?id=${props.imgId}`
     console.log("prop arducampair -> ",props)
     console.log("imageURL -> ",imageURL)
+    console.log("arducamId-> ",incrementer)
+    incrementer += 1 
     
     let {hasLoaded, hasError} = useImage(imageURL) ;
 

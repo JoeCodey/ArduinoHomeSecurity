@@ -1,4 +1,3 @@
-
 import subprocess
 import unittest
 import datetime
@@ -6,9 +5,10 @@ from unittest.case import TestCase
 import uuid 
 import os 
 import json 
-import subprocess
 
-#import Cassandra Db backend 
+
+#import Cassandra Db backend$
+#---- Cassandra Db tests ---- 
 from database.cassandra_connection import MyCassandraDatabase 
 
 def getUniqueId():
@@ -89,16 +89,6 @@ def genTimeStamp():
 
 
 
-#--- Tests ----- 
-def test1_capture(uri = "/capture"):
-   url = base_ArduCam_IP + uri 
-   filename = gen_filename() 
-   r  = requests.get(url, stream = True ) 
-   if r.status_code == 200 : 
-      print("********\nresponse status code : %d\n********\n" % r.status_code )
-      r.raw.decode_content = True 
-      with open(filename,'wb') as f:
-         shutil.copyfileobj(r.raw,f) 
 
 
 
