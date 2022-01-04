@@ -6,10 +6,8 @@ import ArducamEventPair from './arducamEventPair.js'
 
 const IndivBlock = (props) => {
 
-    
-
     const [dataType, setDataType] = useState({dataType: "text"})
-
+    
     function updateState (newState) { setDataType({newState})} 
 
     function condRenderDatatype(props){
