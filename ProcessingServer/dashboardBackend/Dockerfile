@@ -1,7 +1,9 @@
-FROM ubuntu:latest 
+FROM ubuntu:20.04
 
 RUN apt-get update -y 
-RUN apt-get install -y python3-pip python-dev build-essential 
+# /** "python-dev" seems to be depreciates **/
+# RUN apt-get install -y python3-pip python-dev build-essential 
+RUN apt-get install -y python3-pip
 RUN apt-get install curl -y
 RUN apt-get install iputils-ping -y
 
