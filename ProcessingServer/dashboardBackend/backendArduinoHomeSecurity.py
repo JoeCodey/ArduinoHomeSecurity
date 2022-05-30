@@ -133,14 +133,16 @@ def capture_test():
    with open(filename,'r') as f:
     return send_file(filename, mimetype='image/jpeg')
 
-@app.route('/motion',methods = ['POST', 'GET'])
-def realtime_event_linsener():
-   """ Open a local socket over the network with a an 
-       ESP device to get events in real time"""
-   events = realTimeEventSocket(database='initialBlockData.json')
-   events.start_and_bind() 
-   events.begin() 
-   startFlag = True 
+
+#/** Depreciated **/ 
+# @app.route('/motion',methods = ['POST', 'GET'])
+# def realtime_event_linsener():
+#    """ Open a local socket over the network with a an 
+#        ESP device to get events in real time"""
+#    events = realTimeEventSocket(database='/TestData/initialBlockData.json')
+#    events.start_and_bind() 
+#    events.begin() 
+#    startFlag = True 
 
 @app.after_request
 def after_request(response):
@@ -153,7 +155,7 @@ def after_request(response):
 
 if __name__ == '__main__':
    print("... Attempting to run Flask app ... ")
-   app.run(debug = True, port = 8888)
+   app.run(debug = False, port = 8888)
 
 
 
