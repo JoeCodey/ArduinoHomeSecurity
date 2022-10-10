@@ -1,4 +1,5 @@
 import datetime as dt
+from email.quoprimime import unquote
 import os,platform
 import sys, time 
 import json 
@@ -35,6 +36,7 @@ class MyCassandraDatabase:
    
    def __init__(self):
       """ Virtually private constructor. """
+      self.keyspace_id = 'ahs_event_db'
       if MyCassandraDatabase.__instance != None:
          raise Exception("This class is a singleton! We only have one database bro.")
       else:
@@ -50,7 +52,7 @@ class MyCassandraDatabase:
             if error.find('2200') and MyCassandraDatabase.__isStarting == False :
                 MyCassandraDatabase.__isStarting = True 
                 print("Attempting to run docker-compose.yaml file ...\n***Make take 60-90 seconds for Cassandra docker container to initialize")
-                _cwd = os.getcwd() + '/database'
+                _cwd = os.getcwd() 
                 cmd = '''echo "cd %s; docker-compose up; echo DONE! " > cassDoc.command; chmod +x cassDoc.command; open cassDoc.command;
                 ''' %(_cwd)
                 status = os.system(cmd)
@@ -84,6 +86,13 @@ class MyCassandraDatabase:
             self.session.execute("CREATE KEYSPACE ahs_event_db \
             WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};")
             self.session.execute(self.createEventTable(self))
+    try: 
+        self.displayTableContents()
+    except Exception as e: 
+        index = str(e).find('table eventtable does not exist') 
+        if index > 0 :
+            self.session.execute(self.createEventTable())
+    
     
     
    def insertJSON(self,new_json_row):
@@ -108,6 +117,7 @@ class MyCassandraDatabase:
     return "INSERT INTO EventTable(event_id,packet_Id,dataType,timeStart,timeEnd) \
         VALUES("+getUniqueId()+",0,'text','15:30:12:532','15:30:18:532');"
 
+   
    def createEventTable(self):
         return ("""CREATE TABLE eventtable(
     event_id int PRIMARY KEY,
@@ -139,8 +149,7 @@ class MyCassandraDatabase:
         ''' Display all event table contents (FOR TESTING) ''' 
         rows = self.session.execute('SELECT * FROM eventtable Limit 100')
         for row in rows:
-
-            print(row.event_id,row.datatype,row.timeend)
+            print(row.event_id,row.datatype,row.timeend,row.imagepath,row.cameradata)
 
 def test_connect_and_ping(): 
     cass = MyCassandraDatabase.getInstance()
@@ -158,7 +167,29 @@ def test_insertJSON() :
     "timeStart": "15:30:12:532" }' % (unique_id)
     cass.insertJSON(data) 
     cass.displayTableContents()
-    cass.deleteRow(unique_id) 
+    # cass.deleteRow(unique_id) 
+def insertCustomEvent(imageId):
+    imageId = str(imageId)
+    eventId = imageId.split(".")[0]
+    cass = MyCassandraDatabase.getInstance() 
+    data = '{"dataType": "text", \
+    "event_id": %s, \
+    "packet_id": 3, \
+    "location": "entrance", \
+    "timeEnd": "12:30:18:532", \
+    "timeStart": "12:30:12:532", \
+    "imagePath": "./imageCache/%s", \
+    "cameraData": "yes" }'% (eventId,imageId)
+    cass.insertJSON(data)
+    cass.displayTableContents()
+
+
+
+    
+
+
+    
+
 
 def test_getRowJSON() : 
     cass = MyCassandraDatabase.getInstance() 

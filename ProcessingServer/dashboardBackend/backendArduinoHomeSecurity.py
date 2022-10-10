@@ -77,7 +77,7 @@ def getBlockData(id=None):
 
 @app.route('/newblockdata',methods = [ 'GET'])
 def getNewBlockData(id=None):
-   """Get most up to data from file \n
+   """Get most up to data from file \n    
    UDP_SimpleServer populates file with ESP12-E events """
    if db == None:
       with open('./JSON/newData.json', 'r') as myfile:
@@ -162,3 +162,4 @@ if __name__ == '__main__':
 
 
    
+ 

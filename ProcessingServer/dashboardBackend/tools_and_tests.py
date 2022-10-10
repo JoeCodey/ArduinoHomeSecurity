@@ -5,7 +5,48 @@ from unittest.case import TestCase
 import uuid 
 import os 
 import json 
+import socket
 
+#---- Tools ----
+
+def ping_address(addr):
+    res = subprocess.call(['ping', '-q','-c', '3', addr])
+    if res == 0:
+        print( "ping to", addr, "OK")
+    elif res == 2:
+        print("no response from", addr)
+    else:
+        print("ping to", addr, "failed!")
+
+
+
+def gen_filename(extension='.jpg') : 
+    """Generates filename with current time. \n
+    Provide extension to change default '.jpg' \n
+    (Rounds to 3 decimical places at miliseconds"""
+    filename = extension
+    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f')
+    filename = time[:-3] + filename
+    return filename
+
+def genTimeStamp():
+    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f') 
+    return time[:-3] 
+
+
+def get_ip():
+    """Function to reliably get host ip_address, (not 127.0.0.1)"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 #import Cassandra Db backend$
 #---- Cassandra Db tests ---- 
@@ -13,6 +54,7 @@ from database.cassandra_connection import MyCassandraDatabase
 
 def getUniqueId():
     return int(str(uuid.uuid4().fields[-1])[:5] )
+
 class TestCassDb(unittest.TestCase):
 
     __db = None 
@@ -63,31 +105,6 @@ if __name__ == '__main__':
 
 def run_db_unittest():
     return unittest.defaultTestLoader
-def ping_address(addr):
-    res = subprocess.call(['ping', '-q','-c', '3', addr])
-    if res == 0:
-        print( "ping to", addr, "OK")
-    elif res == 2:
-        print("no response from", addr)
-    else:
-        print("ping to", addr, "failed!")
-
-
-
-def gen_filename(extension='.jpg') : 
-    """Generates filename with current time. \n
-    Provide extension to change default '.jpg' \n
-    (Rounds to 3 decimical places at miliseconds"""
-    filename = extension
-    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f')
-    filename = time[:-3] + filename
-    return filename
-
-def genTimeStamp():
-    time = datetime.datetime.now().time().strftime('%H:%M:%S.%f') 
-    return time[:-3] 
-
-
 
 
 
