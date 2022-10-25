@@ -1,4 +1,4 @@
-import socket,platform
+import socket,platform, os
 import json
 import threading, time
 from queue import Queue 
@@ -10,7 +10,7 @@ from database.cassandra_connection import MyCassandraDatabase
 
 UDP_PORT = 50000
 if platform.system() == 'Darwin':
-    UDP_IP = "192.168.2.12"
+    UDP_IP = str(os.system("ipconfig getifaddr en0"))
 elif platform.system() == 'Linux':
     UDP_IP = socket.gethostbyname(socket.gethostname())
     UDP_PORT = 5000

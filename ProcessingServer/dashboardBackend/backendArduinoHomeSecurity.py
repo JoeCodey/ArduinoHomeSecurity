@@ -61,13 +61,14 @@ def hello():
     print('/root')
     return 'Hello World'
 
-@app.route('/blockdata',methods = [ 'GET'])
+@app.route('/api/blockdata',methods = [ 'GET'])
 def getBlockData(id=None):
    """Get initial sample data \n 
    This is used to test front end  """
    print("/blockdata")
-   with open('initialBlockData.json', 'r') as myfile:
+   with open('TestData/initialBlockData.json', 'r') as myfile:
     data=myfile.read()
+    
    blockData = json.loads(data)
     
    if id == None:          
@@ -75,9 +76,9 @@ def getBlockData(id=None):
    else: 
       return "specifc data"
 
-@app.route('/newblockdata',methods = [ 'GET'])
+@app.route('/api/newblockdata',methods = [ 'GET'])
 def getNewBlockData(id=None):
-   """Get most up to data from file \n
+   """Get most up to data from file \n    
    UDP_SimpleServer populates file with ESP12-E events """
    if db == None:
       with open('./JSON/newData.json', 'r') as myfile:
@@ -91,7 +92,7 @@ def getNewBlockData(id=None):
    else: 
       return "specifc data"
 
-@app.route('/getImage',methods = ['POST', 'GET'])
+@app.route('/api/getImage',methods = ['POST', 'GET'])
 def getCameraimage():
    """Get image from file \n
    Indexed by id of corresponsing sensor event (e.g. motion)"""
@@ -162,3 +163,4 @@ if __name__ == '__main__':
 
 
    
+ 

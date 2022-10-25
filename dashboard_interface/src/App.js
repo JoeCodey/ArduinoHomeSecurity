@@ -10,11 +10,11 @@ import { ContactlessOutlined } from '@material-ui/icons';
 const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 === 0 ? "text" : "video", data: " "}}), {})
 /* Must address flask backend as if outside the docker network (e.g. on the host machine)
  * ... because we are making requests from the browser, which is not in the docker network
- * Although curl requests from inside the frontent docker container 
+ * Although curl requests from inside the frontend docker container 
  *  can use the docker network e.g. http://backend:$(port)/...
  *  */ 
 
-const flaskBackendAddress = 'http://localhost:5000/'
+const flaskBackendAddress = '/api'
 
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
@@ -29,7 +29,7 @@ function App() {
   }
   
   //fetch latest data from Flask backend 
-  //TODO: Dockerize backend and frontentend for portability 
+  //TODO: -- DONE -- Dockerize backend and frontentend for portability 
   const fetchnewData = async () => {
     const res = await fetch(`${flaskBackendAddress}/newblockdata`) 
     const data = await res.json() 
@@ -39,7 +39,7 @@ function App() {
   // Fetch indiv block data from server 
   // TODO: Currently not used (also not implemented on backend)
   const fetchBlock = async (id) => {
-    const res = await fetch(`${flaskBackendAddress}blockdata/${id}`) 
+    const res = await fetch(`${flaskBackendAddress}/blockdata/${id}`) 
     const data = await res.json() 
     return data ;   
   }

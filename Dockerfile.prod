@@ -1,0 +1,18 @@
+FROM node:latest as base 
+
+# Create app directory 
+RUN mkdir -p /app
+WORKDIR /app 
+
+COPY ./dashboard_interface/package.json ./
+COPY ./dashboard_interface/src ./src
+COPY ./dashboard_interface/public ./public
+RUN npm install 
+RUN ls
+RUN npm run build 
+
+FROM nginx:stable-alpine    
+COPY --from=base ./app/build /usr/share/nginx/html
+COPY ./deployment/nginx.default.conf /etc/nginx/conf.d/default.conf
+
+

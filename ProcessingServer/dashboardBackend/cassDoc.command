@@ -1,1 +1,1 @@
-cd /usr/src/app/database; docker-compose up; echo DONE! 
+cd /usr/src/app; docker-compose up; echo DONE! 
