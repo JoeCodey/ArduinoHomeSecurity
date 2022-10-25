@@ -182,6 +182,13 @@ def insertCustomEvent(imageId):
     "cameraData": "yes" }'% (eventId,imageId)
     cass.insertJSON(data)
     cass.displayTableContents()
+def populate_db_test_data():
+    cass = MyCassandraDatabase.getInstance() 
+    test_events = os.listdir("../imageCache")
+    for event in test_events : 
+        # note InsertCustomEvent strips file extensions
+        # -- e.g. feed function "testexample.jpg"
+        insertCustomEvent(event)
 
 
 

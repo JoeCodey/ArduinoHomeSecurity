@@ -14,7 +14,7 @@ const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...obj
  *  can use the docker network e.g. http://backend:$(port)/...
  *  */ 
 
-const flaskBackendAddress = 'http://localhost:5000/'
+const flaskBackendAddress = '/api'
 
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
@@ -39,7 +39,7 @@ function App() {
   // Fetch indiv block data from server 
   // TODO: Currently not used (also not implemented on backend)
   const fetchBlock = async (id) => {
-    const res = await fetch(`${flaskBackendAddress}blockdata/${id}`) 
+    const res = await fetch(`${flaskBackendAddress}/blockdata/${id}`) 
     const data = await res.json() 
     return data ;   
   }
