@@ -23,7 +23,7 @@ services:
             - /var/lib/cassandra/data
         ports:
             - 9043:9043
-        command: bash -c 'sleep 60;  /docker-entrypoint.sh cassandra -f'
+        # command: bash -c 'sleep 60;  /docker-entrypoint.sh cassandra -f'
         depends_on:
         - cas1
         environment:
@@ -41,15 +41,15 @@ services:
             - 127.0.0.1:5000:8888
             - $HOST_IP:50000:5000/udp
 
-        depends_on: 
+        depends_on:     
             - cas1 
         
         volumes:
             - ./ProcessingServer/dashboardBackend:/usr/src/app 
         environment: 
-            - FLASK_ENV=development 
+            - FLASK_ENV=production
             - FLASK_APP=backendArduinoHomeSecurity.py 
-            - FLASK_DEBUG=true
+            - FLASK_DEBUG=false
             - CASSANDRA_HOST=cas1 
             - HOST_IP=host.docker.internal
             
@@ -64,9 +64,6 @@ services:
         links:
             - "backend:backend"
    
-
-    
-        
 
     # database: 
     #     extends: 

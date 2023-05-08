@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM python:3.9
 
 RUN apt-get update -y 
 # /** "python-dev" seems to be depreciates **/
@@ -12,7 +12,9 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt /usr/src/app/
 
-RUN pip install -r requirements.txt 
+RUN pip install -r requirements.txt
 
-ENTRYPOINT ["flask"]
-CMD ["run", "--host=0.0.0.0","--port=8888"]
+
+CMD ["gunicorn","-b",":8888","backendArduinoHomeSecurity:app"]
+
+#CMD ["run", "--host=0.0.0.0","--port=8888"]    

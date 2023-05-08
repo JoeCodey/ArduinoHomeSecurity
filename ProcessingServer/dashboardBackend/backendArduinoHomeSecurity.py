@@ -16,7 +16,7 @@ from tools_and_tests import gen_filename
 from tools_and_tests import TestCassDb
 
 app = Flask(__name__)
-
+print("BACKEND: Flask Defined , exec: app = Flask(__name__)") 
 ctx = app.test_request_context() 
 
 # queue to save 10 most recent pictures 

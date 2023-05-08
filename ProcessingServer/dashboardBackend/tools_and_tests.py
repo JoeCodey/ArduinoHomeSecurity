@@ -89,22 +89,25 @@ class TestCassDb(unittest.TestCase):
 
     def test_query_all_json(self):
         ''' test MyCassandraDatabase method to query results in JSON output\n'''
-        result_set = TestCassDb.__db.query_all_json().all()
-        result_arr = []
-        #print("Raw results set : \n%s\n" %(result_set.all()))
-        for row in result_set : 
-            dict_item = json.loads(row.json)
-            result_arr.append(dict_item) 
+        #--  CassandraDb returns results as a "set"  
+        #result_set = TestCassDb.__db.query_all_json().all()
+        result_arr = TestCassDb.__db.query_all_json()
+        
+        # ---- 'Set' to 'List' conversion implm in MyCassDb class 
+        # for row in result_set : 
+        #     dict_item = json.loads(row.json)
+        #     result_arr.append(dict_item) 
             #print("\nA row -> %s | %s \n" % (row.json,type(row)))
             #print("\t str(row) -> %s | %s \n " % (str(row.json),type(str(row.json))))
         #print(result_arr)
         return result_arr
 
+def run_db_unittest():
+    return unittest.defaultTestLoader
+    
 if __name__ == '__main__':
     unittest.main(verbosity=2)
 
-def run_db_unittest():
-    return unittest.defaultTestLoader
 
 
 

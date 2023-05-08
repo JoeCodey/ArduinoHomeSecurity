@@ -4,15 +4,17 @@ import os,platform
 import sys, time 
 import json 
 from datetime import date, timedelta
+from colorama import Fore, Back, Style
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import uuid #great tool for generating unique IDs 
-from cassandra.cluster import Cluster 
+from cassandra.cluster import Cluster
 
 if platform.system() == 'Darwin':
     Cass_IP = '0.0.0.0'
 elif platform.system() == 'Linux':
     Cass_IP = 'cas1'
 
+ # Temp 
 def getUniqueId():
     return str(uuid.uuid4().fields[-1])[:5] 
 
@@ -22,6 +24,8 @@ class MyCassandraDatabase:
    '''
    __instance = None
    __isStarting = False 
+   __debug_counter =0
+   
    @staticmethod 
    def getInstance():
       """ Static access method. """
@@ -31,7 +35,7 @@ class MyCassandraDatabase:
         except Exception as e:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
-            print("ERROR ->\n -- %s -- \n\n" %(e))
+            print(Fore.RED+" DB ERROR ->\n -- %s -- \n\n" %(e))
       return MyCassandraDatabase.__instance
    
    def __init__(self):
@@ -46,7 +50,7 @@ class MyCassandraDatabase:
          try:
             self.connectToCluster()
          except Exception as e:
-            print("Err Occured ->  %s" % (e))
+            print("***\n***\t"+Fore.GREEN+"DB Err Occured ->  %s\n***" % (e))
             error = str(e)
         # Check if cassandra docker needs to be coldstarted (Error 2200)
             if error.find('2200') and MyCassandraDatabase.__isStarting == False :
@@ -73,6 +77,8 @@ class MyCassandraDatabase:
    def connectToCluster(self): 
 
     self.cluster = Cluster([Cass_IP],port=9042)
+    print(Fore.BLUE + str(self.__debug_counter)+"cassandra_connection ... Attempting to connect to Db")
+    self.__debug_counter += 1
     self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
     self.db_online = True
@@ -86,14 +92,20 @@ class MyCassandraDatabase:
             self.session.execute("CREATE KEYSPACE ahs_event_db \
             WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};")
             self.session.execute(self.createEventTable(self))
+            # --- delcare 'USE' of new keyspace ahs_event_db after it was made 
+            self.session.execute('USE ahs_event_db')
     try: 
-        self.displayTableContents()
+        db = self.query_all_json()
+        # if db is empty, populate it with test_data
+        # WARNING --- THIS SHOULD BE CHANGED IN PRODUCTION (actively detecting events) 
+        if len(db) == 0:
+            self.session.execute(self.createEventTable())
+            populate_db_test_data()
     except Exception as e: 
         index = str(e).find('table eventtable does not exist') 
         if index > 0 :
             self.session.execute(self.createEventTable())
-    
-    
+            
     
    def insertJSON(self,new_json_row):
        ''' Insert row given JSON ''' 
@@ -106,7 +118,7 @@ class MyCassandraDatabase:
         query = "Delete from eventtable where event_id = %s " % (_id)
         self.session.execute(query)
    def deleteAll(self):
-       query = 'select JSON* from eventtable'
+       query = 'select JSON* from eventtable' 
        res_set = self.session.execute(query)
        for row in res_set:
            json_elem = json.loads(row.json)

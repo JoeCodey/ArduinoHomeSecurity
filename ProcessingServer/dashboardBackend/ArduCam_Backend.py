@@ -2,7 +2,7 @@ import requests , shutil
 import threading, time 
 import subprocess
 
-base_ArduCam_IP = "192.168.2.203"
+base_ArduCam_IP = "192.168.0.15"
 class ArduCamBackend:
     def __init__(self,ip = base_ArduCam_IP):
         self.base_ip = ip
@@ -41,10 +41,10 @@ def test_isCameraAvail():
     returned_value = isCameraAvail(base_ArduCam_IP)
     print(returned_value)
 
-def run_network_scan():
-    addresses_of_interest = ["192.168.2.42",base_ArduCam_IP]
-    for ping in addresses_of_interest:
-        address = base_ArduCam_IP
+def run_network_scan(route=''):
+    addresses_of_interest = [base_ArduCam_IP,"192.168.0.10","192.168.0.11","192.168.0.12","192.168.0.14","192.168.0.15"]
+    for address in addresses_of_interest:
+        address = address+route
         res = subprocess.call(['ping', '-c', '3', address])
         if res == 0:
             print( "ping to", address, "OK")
