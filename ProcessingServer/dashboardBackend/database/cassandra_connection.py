@@ -3,6 +3,7 @@ from email.quoprimime import unquote
 import os,platform
 import sys, time 
 import json 
+import logging  
 from datetime import date, timedelta
 from colorama import Fore, Back, Style
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -11,6 +12,7 @@ from cassandra.cluster import Cluster
 
 if platform.system() == 'Darwin':
     Cass_IP = '0.0.0.0'
+
 elif platform.system() == 'Linux':
     Cass_IP = 'cas1'
 
@@ -21,13 +23,13 @@ def getUniqueId():
 class MyCassandraDatabase:
    '''
     Encapsulation of cassandra database implementation **Implements Singleton pattern, so only one database can be created** 
-   '''
+   '''  
    __instance = None
    __isStarting = False 
    __debug_counter =0
    
    @staticmethod 
-   def getInstance():
+   def getInstance():   
       """ Static access method. """
       if MyCassandraDatabase.__instance == None:
         try: 
@@ -41,6 +43,7 @@ class MyCassandraDatabase:
    def __init__(self):
       """ Virtually private constructor. """
       self.keyspace_id = 'ahs_event_db'
+      
       if MyCassandraDatabase.__instance != None:
          raise Exception("This class is a singleton! We only have one database bro.")
       else:
@@ -50,60 +53,94 @@ class MyCassandraDatabase:
          try:
             self.connectToCluster()
          except Exception as e:
-            print("***\n***\t"+Fore.GREEN+"DB Err Occured ->  %s\n***" % (e))
+            print("***\n***\t"+Fore.GREEN+"(Alpha) DB Err Occured ->  %s\n***" % (e))
             error = str(e)
+            #Wait for Cassandra docker container to be online (90 sec)
+            timeout_at = dt.datetime.now() + timedelta(seconds=90)
+            attempt_delay = 5 
+            
+            while(True and self.db_online != True):
+                        # attempt connection after attempt_delay 
+                        next_time = time.time() + attempt_delay 
+                        try:
+                            print(Fore.RED + str(self.__debug_counter)+"(beta) cassandra_connection ... Attempting to connect to Db")
+                            print("Sleep Time -> %s"%(str(max(0,next_time-time.time()))))
+                            #time.sleep(max(0,time.time()+next_time))
+                            print("... Looping ...")
+                            self.connectToCluster() 
+                            
+                        except Exception as e:
+                            pass 
+                        if timeout_at < dt.datetime.now() :
+                            raise Exception("TimeOutError: Cassandra_connection.py says -> Timeout, Could not connect to Cassandra Db")
+                            break
+                        next_time += (time.time() - next_time) // attempt_delay * attempt_delay + attempt_delay
         # Check if cassandra docker needs to be coldstarted (Error 2200)
-            if error.find('2200') and MyCassandraDatabase.__isStarting == False :
-                MyCassandraDatabase.__isStarting = True 
-                print("Attempting to run docker-compose.yaml file ...\n***Make take 60-90 seconds for Cassandra docker container to initialize")
-                _cwd = os.getcwd() 
-                cmd = '''echo "cd %s; docker-compose up; echo DONE! " > cassDoc.command; chmod +x cassDoc.command; open cassDoc.command;
-                ''' %(_cwd)
-                status = os.system(cmd)
+        # ONLY USEFULL WHEN STARTING FROM MAC OS OUTSIDE A DOCKER ENVIRONMENT 
+            if platform.system() == 'Darwin':
+                if error.find('2200') and MyCassandraDatabase.__isStarting == False :
+                    MyCassandraDatabase.__isStarting = True 
+                    print("Attempting to run docker-compose.yaml file ...\n***Make take 60-90 seconds for Cassandra docker container to initialize")
+                    _cwd = os.getcwd() 
+                    cmd = '''echo "cd %s; docker-compose up; echo DONE! " > cassDoc.command; chmod +x cassDoc.command; open cassDoc.command;
+                    ''' %(_cwd)
+                    status = os.system(cmd)
+                    
+                    #Wait for Cassandra docker container to be online (90 sec)
+                    timeout_at = dt.datetime.now() + timedelta(seconds=90)
                 
-                #Wait for Cassandra docker container to be online (90 sec)
-                timeout_at = dt.datetime.now() + timedelta(seconds=90)
-               
-                while(True and self.db_online != True):
-                    try:
-                        self.connectToCluster() 
-                        
-                    except Exception as e:
-                        pass 
-                    if timeout_at < dt.datetime.now() :
-                        raise Exception("TimeOutError: Cassandra_connection.py says -> Timeout, Could not connect to Cassandra Db")
-                        break
+                    while(True and self.db_online != True):
+                        try:
+                            self.connectToCluster() 
+                            
+                        except Exception as e:
+                            pass 
+                        if timeout_at < dt.datetime.now() :
+                            raise Exception("TimeOutError: Cassandra_connection.py says -> Timeout, Could not connect to Cassandra Db")
+                            break
 
    def connectToCluster(self): 
 
     self.cluster = Cluster([Cass_IP],port=9042)
-    print(Fore.BLUE + str(self.__debug_counter)+"cassandra_connection ... Attempting to connect to Db")
+    print(Fore.BLUE + str(self.__debug_counter)+"(Charlie) cassandra_connection ... Attempting to connect to Db")
     self.__debug_counter += 1
     self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
-    self.db_online = True
+    print(Fore.YELLOW + str(self.__debug_counter)+"(delta) Cassandra Db connection established")
+    self.db_online = True   
     try:
         self.session.execute('USE ahs_event_db')
     except Exception as e: 
         error = str(e)
+        print(Fore.LIGHTYELLOW_EX + str(self.__debug_counter)+"(echo) Setting Up Table")
         index = error.find("Keyspace 'ahs_event_db' does not exist")
         #--Auto-initialize Keyspace if it hasn't been initialized--
-        if index > 0: 
+        if index > 0:
+            print(Fore.RED+"ALPHA ") 
             self.session.execute("CREATE KEYSPACE ahs_event_db \
             WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};")
-            self.session.execute(self.createEventTable(self))
             # --- delcare 'USE' of new keyspace ahs_event_db after it was made 
             self.session.execute('USE ahs_event_db')
+            # Create Eventtable after keyspeac is created 
+            # --- TODO: If these commands fail, how can we ensure that the keyspaces and eventtable are created and attacehd to the instance
+            self.session.execute(self.createEventTable())
     try: 
         db = self.query_all_json()
         # if db is empty, populate it with test_data
         # WARNING --- THIS SHOULD BE CHANGED IN PRODUCTION (actively detecting events) 
+        print(Fore.RED+"BETA")
         if len(db) == 0:
-            self.session.execute(self.createEventTable())
-            populate_db_test_data()
+            print(Fore.RED+"CHARLIE")
+            try:
+                print("\n\nAAHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                val = populate_db_test_data() 
+                print('Val = %s'%(val))
+            except Exception as e: 
+                print("Error from data population funciton RetVal:%s,\nErr:%s"%(val,str(e)))
     except Exception as e: 
         index = str(e).find('table eventtable does not exist') 
         if index > 0 :
+            print(Fore.RED+"DELTA ")
             self.session.execute(self.createEventTable())
             
     
@@ -194,13 +231,21 @@ def insertCustomEvent(imageId):
     "cameraData": "yes" }'% (eventId,imageId)
     cass.insertJSON(data)
     cass.displayTableContents()
+
 def populate_db_test_data():
     cass = MyCassandraDatabase.getInstance() 
-    test_events = os.listdir("../imageCache")
+    print("WHERE ARE WE ? ? ")
+    try:
+        test_events = os.listdir("/imageCache")
+    except Exception as e: 
+        print("Error Os.listdir -> %s"%(str(e)))
+    print(test_events)
     for event in test_events : 
         # note InsertCustomEvent strips file extensions
         # -- e.g. feed function "testexample.jpg"
+        print("attempting to insert %s"%(event))
         insertCustomEvent(event)
+    return 1
 
 
 
