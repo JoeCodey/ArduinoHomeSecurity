@@ -63,10 +63,10 @@ class MyCassandraDatabase:
                         # attempt connection after attempt_delay 
                         next_time = time.time() + attempt_delay 
                         try:
-                            print(Fore.RED + str(self.__debug_counter)+"(beta) cassandra_connection ... Attempting to connect to Db")
+                            #print(Fore.RED + str(self.__debug_counter)+"(beta) cassandra_connection ... Attempting to connect to Db")
                             print("Sleep Time -> %s"%(str(max(0,next_time-time.time()))))
-                            #time.sleep(max(0,time.time()+next_time))
-                            print("... Looping ...")
+                            sleep_time = max(0,next_time-time.time())
+                            time.sleep(sleep_time)
                             self.connectToCluster() 
                             
                         except Exception as e:
@@ -82,6 +82,7 @@ class MyCassandraDatabase:
                     MyCassandraDatabase.__isStarting = True 
                     print("Attempting to run docker-compose.yaml file ...\n***Make take 60-90 seconds for Cassandra docker container to initialize")
                     _cwd = os.getcwd() 
+                    os.lstat()
                     cmd = '''echo "cd %s; docker-compose up; echo DONE! " > cassDoc.command; chmod +x cassDoc.command; open cassDoc.command;
                     ''' %(_cwd)
                     status = os.system(cmd)
@@ -102,7 +103,7 @@ class MyCassandraDatabase:
    def connectToCluster(self): 
 
     self.cluster = Cluster([Cass_IP],port=9042)
-    print(Fore.BLUE + str(self.__debug_counter)+"(Charlie) cassandra_connection ... Attempting to connect to Db")
+    #print(Fore.BLUE + str(self.__debug_counter)+"(Charlie) cassandra_connection ... Attempting to connect to Db")
     self.__debug_counter += 1
     self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
@@ -234,9 +235,8 @@ def insertCustomEvent(imageId):
 
 def populate_db_test_data():
     cass = MyCassandraDatabase.getInstance() 
-    print("WHERE ARE WE ? ? ")
     try:
-        test_events = os.listdir("/imageCache")
+        test_events = os.listdir("./imageCache")
     except Exception as e: 
         print("Error Os.listdir -> %s"%(str(e)))
     print(test_events)
