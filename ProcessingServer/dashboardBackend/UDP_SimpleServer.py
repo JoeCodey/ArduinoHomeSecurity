@@ -4,8 +4,9 @@ import threading, time
 from queue import Queue 
 from colorama import Fore, Back, Style
 from  ArduCam_Backend import isCameraAvail,runArduCam
-from tools_and_tests import genTimeStamp, getUniqueId, ping_address
+from utilities.tools_and_tests import genTimeStamp, getUniqueId, ping_address
 from database.cassandra_connection import MyCassandraDatabase 
+
 
 
 UDP_PORT = 50000
@@ -14,6 +15,8 @@ if platform.system() == 'Darwin':
 elif platform.system() == 'Linux':
     UDP_IP = socket.gethostbyname(socket.gethostname())
     UDP_PORT = 5000
+
+
 
 
 class realTimeEventSocket :
