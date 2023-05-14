@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import uuid #great tool for generating unique IDs 
 from cassandra.cluster import Cluster
 
+
 if platform.system() == 'Darwin':
     Cass_IP = '0.0.0.0'
 
@@ -19,6 +20,42 @@ elif platform.system() == 'Linux':
  # Temp 
 def getUniqueId():
     return str(uuid.uuid4().fields[-1])[:5] 
+
+# Define new level
+LOGIC_LEVEL_NUM = 15
+logging.addLevelName(LOGIC_LEVEL_NUM, "LOGIC")
+
+# Add a new method to the logger
+def logic(self, message, *args, **kws):
+    if self.isEnabledFor(LOGIC_LEVEL_NUM):
+        self._log(LOGIC_LEVEL_NUM, message, args, **kws) 
+
+logging.Logger.logic = logic
+
+FMT = "[{levelname:^9}] {asctime} {msecs:03.0f} [{filename}s:{lineno}] {message}"
+FORMATS = {
+    logging.DEBUG: f"\33[32m{FMT}\33[0m", 
+    logging.INFO: f"\33[34m{FMT}\33[0m",
+    logging.WARNING: f"\33[33m{FMT}\33[0m",
+    logging.ERROR: f"\33[31m{FMT}\33[0m",
+    logging.CRITICAL: f"\33[1m{FMT}\33[0m",
+    LOGIC_LEVEL_NUM: f"\33[38;2;255;116;23m{FMT}\33[0m"
+}
+class CustomFormatter(logging.Formatter):
+    def format(self, record):
+        log_fmt = FORMATS[record.levelno]
+        formatter = logging.Formatter(log_fmt, style="{",datefmt='%H:%S')
+        return formatter.format(record)
+
+handler = logging.StreamHandler() 
+handler.setFormatter(CustomFormatter())
+
+logging.basicConfig(
+    level = logging.DEBUG, 
+    handlers=[handler]
+)
+
+log = logging.getLogger("coloured-logger")
 
 class MyCassandraDatabase:
    '''
@@ -38,6 +75,7 @@ class MyCassandraDatabase:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
             print(Fore.RED+" DB ERROR ->\n -- %s -- \n\n" %(e))
+      log.info("Returning reference to existing Cassandra DB")
       return MyCassandraDatabase.__instance
    
    def __init__(self):
@@ -53,7 +91,9 @@ class MyCassandraDatabase:
          try:
             self.connectToCluster()
          except Exception as e:
-            print("***\n***\t"+Fore.GREEN+"(Alpha) DB Err Occured ->  %s\n***" % (e))
+            print("***\n***\t"+"(Alpha) DB Err Occured ->  %s\n***" % (e))
+            log.error("***\n***\t"+"(Alpha) DB Err Occured ->  %s\n***" % (e))
+            
             error = str(e)
             #Wait for Cassandra docker container to be online (90 sec)
             timeout_at = dt.datetime.now() + timedelta(seconds=90)
@@ -65,6 +105,7 @@ class MyCassandraDatabase:
                         try:
                             #print(Fore.RED + str(self.__debug_counter)+"(beta) cassandra_connection ... Attempting to connect to Db")
                             print("Sleep Time -> %s"%(str(max(0,next_time-time.time()))))
+                            log.logic("Sleep Time -> %s"%(str(max(0,next_time-time.time()))))
                             sleep_time = max(0,next_time-time.time())
                             time.sleep(sleep_time)
                             self.connectToCluster() 
@@ -104,20 +145,22 @@ class MyCassandraDatabase:
 
     self.cluster = Cluster([Cass_IP],port=9042)
     #print(Fore.BLUE + str(self.__debug_counter)+"(Charlie) cassandra_connection ... Attempting to connect to Db")
+    log.logic("cassandra_connection ... Attempting to connect to Db")
     self.__debug_counter += 1
     self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
     print(Fore.YELLOW + str(self.__debug_counter)+"(delta) Cassandra Db connection established")
+    log.info(str(self.__debug_counter)+"(delta) Cassandra Db connection established")
     self.db_online = True   
     try:
         self.session.execute('USE ahs_event_db')
     except Exception as e: 
         error = str(e)
         print(Fore.LIGHTYELLOW_EX + str(self.__debug_counter)+"(echo) Setting Up Table")
+        log.error(error)
         index = error.find("Keyspace 'ahs_event_db' does not exist")
         #--Auto-initialize Keyspace if it hasn't been initialized--
         if index > 0:
-            print(Fore.RED+"ALPHA ") 
             self.session.execute("CREATE KEYSPACE ahs_event_db \
             WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};")
             # --- delcare 'USE' of new keyspace ahs_event_db after it was made 
@@ -129,11 +172,9 @@ class MyCassandraDatabase:
         db = self.query_all_json()
         # if db is empty, populate it with test_data
         # WARNING --- THIS SHOULD BE CHANGED IN PRODUCTION (actively detecting events) 
-        print(Fore.RED+"BETA")
         if len(db) == 0:
-            print(Fore.RED+"CHARLIE")
             try:
-                print("\n\nAAHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                log.logic("populating with db test data")
                 val = populate_db_test_data() 
                 print('Val = %s'%(val))
             except Exception as e: 
@@ -231,20 +272,21 @@ def insertCustomEvent(imageId):
     "imagePath": "./imageCache/%s", \
     "cameraData": "yes" }'% (eventId,imageId)
     cass.insertJSON(data)
-    cass.displayTableContents()
+    #cass.displayTableContents()
 
 def populate_db_test_data():
     cass = MyCassandraDatabase.getInstance() 
     try:
         test_events = os.listdir("./imageCache")
     except Exception as e: 
-        print("Error Os.listdir -> %s"%(str(e)))
-    print(test_events)
+        log.error(str(e))
     for event in test_events : 
         # note InsertCustomEvent strips file extensions
         # -- e.g. feed function "testexample.jpg"
-        print("attempting to insert %s"%(event))
+        #print("attempting to insert %s"%(event))
         insertCustomEvent(event)
+
+    log.info("func populate_db_test_data EXECUTED")
     return 1
 
 
