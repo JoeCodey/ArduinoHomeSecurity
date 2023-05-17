@@ -2,8 +2,7 @@ import datetime as dt
 from email.quoprimime import unquote
 import os,platform
 import sys, time 
-import json 
-import logging  
+import json
 from datetime import date, timedelta
 from colorama import Fore, Back, Style
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -22,15 +21,7 @@ elif platform.system() == 'Linux':
 def getUniqueId():
     return str(uuid.uuid4().fields[-1])[:5] 
 
-# Define new level
-LOGIC_LEVEL_NUM = 15
-logging.addLevelName(LOGIC_LEVEL_NUM, "LOGIC")
-
-# Add a new method to the logger
-def logic(self, message, *args, **kws):
-    if self.isEnabledFor(LOGIC_LEVEL_NUM):
-        self._log(LOGIC_LEVEL_NUM, message, args, **kws) 
-
+#Get custom logger object from utilites module {Log.error()...}
 log = get_logger_obj() 
 
 class MyCassandraDatabase:
@@ -67,9 +58,7 @@ class MyCassandraDatabase:
          try:
             self.connectToCluster()
          except Exception as e:
-            print("***\n***\t"+"(Alpha) DB Err Occured ->  %s\n***" % (e))
             log.error("***\n***\t"+"(Alpha) DB Err Occured ->  %s\n***" % (e))
-            
             error = str(e)
             #Wait for Cassandra docker container to be online (90 sec)
             timeout_at = dt.datetime.now() + timedelta(seconds=90)
@@ -78,20 +67,18 @@ class MyCassandraDatabase:
             while(True and self.db_online != True):
                         # attempt connection after attempt_delay 
                         next_time = time.time() + attempt_delay 
-                        try:
-                            #print(Fore.RED + str(self.__debug_counter)+"(beta) cassandra_connection ... Attempting to connect to Db")
-                            print("Sleep Time -> %s"%(str(max(0,next_time-time.time()))))
+                        try: 
                             log.logic("Sleep Time -> %s"%(str(max(0,next_time-time.time()))))
                             sleep_time = max(0,next_time-time.time())
                             time.sleep(sleep_time)
                             self.connectToCluster() 
-                            
                         except Exception as e:
                             pass 
                         if timeout_at < dt.datetime.now() :
                             raise Exception("TimeOutError: Cassandra_connection.py says -> Timeout, Could not connect to Cassandra Db")
                             break
                         next_time += (time.time() - next_time) // attempt_delay * attempt_delay + attempt_delay
+       
         # Check if cassandra docker needs to be coldstarted (Error 2200)
         # ONLY USEFULL WHEN STARTING FROM MAC OS OUTSIDE A DOCKER ENVIRONMENT 
             if platform.system() == 'Darwin':
@@ -123,11 +110,12 @@ class MyCassandraDatabase:
     #print(Fore.BLUE + str(self.__debug_counter)+"(Charlie) cassandra_connection ... Attempting to connect to Db")
     log.logic("cassandra_connection ... Attempting to connect to Db")
     self.__debug_counter += 1
-    self.session = self.cluster.connect()
     #If this line is executed, no error was thrown and Cass docker is online 
-    print(Fore.YELLOW + str(self.__debug_counter)+"(delta) Cassandra Db connection established")
+    self.session = self.cluster.connect()
+    
     log.info(str(self.__debug_counter)+"(delta) Cassandra Db connection established")
-    self.db_online = True   
+    self.db_online = True 
+    self.__isStarting = False   
     try:
         self.session.execute('USE ahs_event_db')
     except Exception as e: 
@@ -151,7 +139,7 @@ class MyCassandraDatabase:
         if len(db) == 0:
             try:
                 log.logic("populating with db test data")
-                val = populate_db_test_data() 
+                val = CassandraDbManualTools.populate_db_test_data() 
                 print('Val = %s'%(val))
             except Exception as e: 
                 print("Error from data population funciton RetVal:%s,\nErr:%s"%(val,str(e)))
@@ -218,64 +206,59 @@ class MyCassandraDatabase:
         for row in rows:
             print(row.event_id,row.datatype,row.timeend,row.imagepath,row.cameradata)
 
-def test_connect_and_ping(): 
-    cass = MyCassandraDatabase.getInstance()
-    cass.displayTableContents()
-    return cass
+class CassandraDbManualTools:
+    # Collection of functions to control db manually 
 
-def test_insertJSON() : 
-    cass = MyCassandraDatabase.getInstance()
-    unique_id = getUniqueId()
-    data = '{"dataType": "text&video", \
-    "event_id": %s, \
-    "packet_id": 3, \
-    "location": "entrance", \
-    "timeEnd": "15:30:18:532", \
-    "timeStart": "15:30:12:532" }' % (unique_id)
-    cass.insertJSON(data) 
-    cass.displayTableContents()
-    # cass.deleteRow(unique_id) 
-def insertCustomEvent(imageId):
-    imageId = str(imageId)
-    eventId = imageId.split(".")[0]
-    cass = MyCassandraDatabase.getInstance() 
-    data = '{"dataType": "text", \
-    "event_id": %s, \
-    "packet_id": 3, \
-    "location": "entrance", \
-    "timeEnd": "12:30:18:532", \
-    "timeStart": "12:30:12:532", \
-    "imagePath": "./imageCache/%s", \
-    "cameraData": "yes" }'% (eventId,imageId)
-    cass.insertJSON(data)
-    #cass.displayTableContents()
+    def test_connect_and_ping(): 
+        cass = MyCassandraDatabase.getInstance()
+        cass.displayTableContents()
+        return cass
 
-def populate_db_test_data():
-    cass = MyCassandraDatabase.getInstance() 
-    try:
-        test_events = os.listdir("./imageCache")
-    except Exception as e: 
-        log.error(str(e))
-    for event in test_events : 
-        # note InsertCustomEvent strips file extensions
-        # -- e.g. feed function "testexample.jpg"
-        #print("attempting to insert %s"%(event))
-        insertCustomEvent(event)
+    def test_insertJSON() : 
+        cass = MyCassandraDatabase.getInstance()
+        unique_id = getUniqueId()
+        data = '{"dataType": "text&video", \
+        "event_id": %s, \
+        "packet_id": 3, \
+        "location": "entrance", \
+        "timeEnd": "15:30:18:532", \
+        "timeStart": "15:30:12:532" }' % (unique_id)
+        cass.insertJSON(data) 
+        cass.displayTableContents()
+        # cass.deleteRow(unique_id) 
+    def insertCustomEvent(imageId):
+        imageId = str(imageId)
+        eventId = imageId.split(".")[0]
+        cass = MyCassandraDatabase.getInstance() 
+        data = '{"dataType": "text", \
+        "event_id": %s, \
+        "packet_id": 3, \
+        "location": "entrance", \
+        "timeEnd": "12:30:18:532", \
+        "timeStart": "12:30:12:532", \
+        "imagePath": "./imageCache/%s", \
+        "cameraData": "yes" }'% (eventId,imageId)
+        cass.insertJSON(data)
+        #cass.displayTableContents()
 
-    log.info("func populate_db_test_data EXECUTED")
-    return 1
+    def populate_db_test_data():
+        cass = MyCassandraDatabase.getInstance() 
+        try:
+            test_events = os.listdir("./imageCache")
+        except Exception as e: 
+            log.error(str(e))
+        for event in test_events : 
+            # note InsertCustomEvent strips file extensions
+            # -- e.g. feed function "testexample.jpg"
+            #print("attempting to insert %s"%(event))
+            CassandraDbManualTools.insertCustomEvent(event)
 
+        log.info("func populate_db_test_data EXECUTED")
+        return 1
 
-
-    
-
-
-    
-
-
-def test_getRowJSON() : 
-    cass = MyCassandraDatabase.getInstance() 
-    res = cass.getRowById()
-    print(res.one())
+    def test_getRowJSON() : 
+        cass = MyCassandraDatabase.getInstance() 
+        res = cass.getRowById()
+        print(res.one())
     
     

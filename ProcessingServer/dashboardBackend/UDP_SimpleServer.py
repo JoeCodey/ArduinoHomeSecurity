@@ -8,16 +8,12 @@ from utilities.tools_and_tests import genTimeStamp, getUniqueId, ping_address
 from database.cassandra_connection import MyCassandraDatabase 
 
 
-
 UDP_PORT = 50000
 if platform.system() == 'Darwin':
     UDP_IP = str(os.system("ipconfig getifaddr en0"))
 elif platform.system() == 'Linux':
     UDP_IP = socket.gethostbyname(socket.gethostname())
     UDP_PORT = 5000
-
-
-
 
 class realTimeEventSocket :
     
