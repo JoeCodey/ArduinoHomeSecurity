@@ -50,9 +50,9 @@ const ArducamEventPair = (props) => {
      
 
     const imageURL =  `${flaskBackendAddress}/getImage?id=${props.imgId}`
-    console.log("prop arducampair -> ",props)
-    console.log("imageURL -> ",imageURL)
-    console.log("arducamId-> ",incrementer)
+    // console.log("prop arducampair -> ",props)
+    // console.log("imageURL -> ",imageURL)
+    // console.log("arducamId-> ",incrementer)
     incrementer += 1 
     
     let {hasLoaded, hasError} = useImage(imageURL) ;

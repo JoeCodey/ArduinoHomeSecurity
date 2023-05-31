@@ -155,6 +155,7 @@ class MyCassandraDatabase:
        Flags that data has change to WebSocket can communciate '''
        #import function which updates the WebSocket connected to the front end
        #from main controller file of the app (backendArdu...)
+       from flask import current_app
        from server.backendArduinoHomeSecurity import update_websocket
        
        try : 
@@ -164,11 +165,12 @@ class MyCassandraDatabase:
            query = query.lower() 
            insert_truth = query.find("insert")
            delete_truth = query.find("delete") 
-           log.debug("query -> %s ||| truth value -> %s,%s"%(query,str(insert_truth),str(delete_truth)))
+           #log.debug("query -> %s ||| truth value -> %s,%s"%(query,str(insert_truth),str(delete_truth)))
            if query.find("insert")>=0 or query.find("delete")>=0: 
                #executed query changed db -> update WebSocket
                log.info("Attempting to update front via WebSocket")
-               update_websocket()
+               with current_app.app_context():
+                update_websocket()
             # return results from query 
            return res 
        except Exception as e: 
@@ -207,7 +209,7 @@ class MyCassandraDatabase:
     timeEnd text,
     imagepath text,
     cameradata text
-    );""")
+    );""")  
    def query_all_json(self):
        ''' Returns all entries as Cassandra Result Set object'''
        query = 'select JSON* from eventtable'
