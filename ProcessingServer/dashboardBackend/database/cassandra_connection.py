@@ -148,21 +148,45 @@ class MyCassandraDatabase:
         if index > 0 :
             print(Fore.RED+"DELTA ")
             self.session.execute(self.createEventTable())
-            
+
+   def execute_query(self,query): 
+       '''
+       Universal method to execute Cassandra querry
+       Flags that data has change to WebSocket can communciate '''
+       #import function which updates the WebSocket connected to the front end
+       #from main controller file of the app (backendArdu...)
+       from server.backendArduinoHomeSecurity import update_websocket
+       
+       try : 
+           res = self.session.execute(query)
+           #if no error is thrown, querry sucessful
+           #if querry includes 
+           query = query.lower() 
+           insert_truth = query.find("insert")
+           delete_truth = query.find("delete") 
+           log.debug("query -> %s ||| truth value -> %s,%s"%(query,str(insert_truth),str(delete_truth)))
+           if query.find("insert")>=0 or query.find("delete")>=0: 
+               #executed query changed db -> update WebSocket
+               log.info("Attempting to update front via WebSocket")
+               update_websocket()
+            # return results from query 
+           return res 
+       except Exception as e: 
+           log.error(str(e))
     
    def insertJSON(self,new_json_row):
        ''' Insert row given JSON ''' 
        if type(new_json_row) == dict:
            new_json_row = json.dumps(new_json_row)
        querry = 'INSERT INTO eventtable JSON \'' + new_json_row + "';"
-       self.session.execute(querry)
+       self.execute_query(querry)
     
    def deleteRow(self,_id):
         query = "Delete from eventtable where event_id = %s " % (_id)
-        self.session.execute(query)
+        self.execute_query(query)
    def deleteAll(self):
        query = 'select JSON* from eventtable' 
-       res_set = self.session.execute(query)
+       res_set = self.execute_query(query)
        for row in res_set:
            json_elem = json.loads(row.json)
            self.deleteRow(json_elem['event_id'])
@@ -187,7 +211,7 @@ class MyCassandraDatabase:
    def query_all_json(self):
        ''' Returns all entries as Cassandra Result Set object'''
        query = 'select JSON* from eventtable'
-       res_set = self.session.execute(query)
+       res_set = self.execute_query(query)
        res_json_arr = []
        for row in res_set:
            json_elem = json.loads(row.json)
@@ -196,13 +220,13 @@ class MyCassandraDatabase:
  
    def getRowById_JSON(self,_id):
        query = "select JSON* from eventtable where event_id=%s ;" % (_id)
-       res = self.session.execute(query)
+       res = self.execute_query(query)
        return res.one().json
 
 
    def displayTableContents(self): 
         ''' Display all event table contents (FOR TESTING) ''' 
-        rows = self.session.execute('SELECT * FROM eventtable Limit 100')
+        rows = self.execute_query('SELECT * FROM eventtable Limit 100')
         for row in rows:
             print(row.event_id,row.datatype,row.timeend,row.imagepath,row.cameradata)
 
@@ -224,7 +248,7 @@ class CassandraDbManualTools:
         "timeEnd": "15:30:18:532", \
         "timeStart": "15:30:12:532" }' % (unique_id)
         cass.insertJSON(data) 
-        cass.displayTableContents()
+        #cass.displayTableContents()
         # cass.deleteRow(unique_id) 
     def insertCustomEvent(imageId):
         imageId = str(imageId)
@@ -236,7 +260,7 @@ class CassandraDbManualTools:
         "location": "entrance", \
         "timeEnd": "12:30:18:532", \
         "timeStart": "12:30:12:532", \
-        "imagePath": "./imageCache/%s", \
+        "imagePath": "../imageCache/%s", \
         "cameraData": "yes" }'% (eventId,imageId)
         cass.insertJSON(data)
         #cass.displayTableContents()

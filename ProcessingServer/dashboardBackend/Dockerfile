@@ -12,9 +12,9 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt /usr/src/app/
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
-CMD ["gunicorn","-b",":8888","backendArduinoHomeSecurity:app"]
+CMD ["gunicorn","--worker-class", "eventlet", "-w", "1","-b",":8888","server.backendArduinoHomeSecurity:app"]
 
 #CMD ["run", "--host=0.0.0.0","--port=8888"]    
