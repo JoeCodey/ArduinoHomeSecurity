@@ -68,7 +68,7 @@ function App() {
       setBlockData(blocksFromServer);
   }
 
-    // getBlocks();
+    getBlocks();
     // Get new event data for every block from backend 
     // TODO: replace SetInterval Polling implementation 
     // with realtime Web Socket Connection 
@@ -92,6 +92,7 @@ function App() {
     socket.emit('test_message', 'Hello from React');
     socket.on('testResponse', (data) => {
       console.log('Received testResponse:', data);
+      getBlocks();
     });
 
     socket.on('newdata', (data) => {

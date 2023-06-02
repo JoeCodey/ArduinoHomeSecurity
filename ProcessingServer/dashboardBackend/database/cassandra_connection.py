@@ -3,6 +3,7 @@ from email.quoprimime import unquote
 import os,platform
 import sys, time 
 import json
+import requests
 from datetime import date, timedelta
 from colorama import Fore, Back, Style
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -149,39 +150,40 @@ class MyCassandraDatabase:
             print(Fore.RED+"DELTA ")
             self.session.execute(self.createEventTable())
 
-   def execute_query(self,query): 
+   def execute_query(self,query,web_sock_communication=True): 
        '''
        Universal method to execute Cassandra querry
        Flags that data has change to WebSocket can communciate '''
        #import function which updates the WebSocket connected to the front end
        #from main controller file of the app (backendArdu...)
-       from flask import current_app
-       from server.backendArduinoHomeSecurity import update_websocket
+    #    from flask import current_app
+    #    from server.backendArduinoHomeSecurity import update_websocket
        
        try : 
            res = self.session.execute(query)
            #if no error is thrown, querry sucessful
            #if querry includes 
-           query = query.lower() 
+           query = query.lower()    
            insert_truth = query.find("insert")
            delete_truth = query.find("delete") 
            #log.debug("query -> %s ||| truth value -> %s,%s"%(query,str(insert_truth),str(delete_truth)))
-           if query.find("insert")>=0 or query.find("delete")>=0: 
+           if query.find("insert")>=0 or query.find("delete")>=0 and web_sock_communication==True: 
                #executed query changed db -> update WebSocket
                log.info("Attempting to update front via WebSocket")
-               with current_app.app_context():
-                update_websocket()
+               response = requests.get("http://backend:8888/api/trigWebSockUpdate")
+               #with current_app.app_context():
+            # update_websocket()
             # return results from query 
            return res 
        except Exception as e: 
            log.error(str(e))
     
-   def insertJSON(self,new_json_row):
+   def insertJSON(self,new_json_row,web_sock_communication=True):
        ''' Insert row given JSON ''' 
        if type(new_json_row) == dict:
            new_json_row = json.dumps(new_json_row)
        querry = 'INSERT INTO eventtable JSON \'' + new_json_row + "';"
-       self.execute_query(querry)
+       self.execute_query(querry,web_sock_communication)
     
    def deleteRow(self,_id):
         query = "Delete from eventtable where event_id = %s " % (_id)
