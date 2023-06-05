@@ -24,8 +24,9 @@ ProcessingServer/dashboardBackend/submits08fp4bl.tmp
 ProcessingServer/dashboardBackend/utput
 ProcessingServer/dashboardBackend/__pycache__/
 ProcessingServer/dashboardBackend/imageCache/
+ProcessingServer/dashboardBackend/TestData/
 
-ProcessingServer/dashboardBackend/*
+
 ProcessingServer/dashboardBackend/JSON/
 
 dashboard_interface/public/testImageDashboard.jpg
