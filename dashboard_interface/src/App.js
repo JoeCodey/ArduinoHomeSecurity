@@ -25,15 +25,14 @@ const socket = io(webSocketBackendAddress,
 
 function App() {
   // Global for the type of data that will be shown in each dashboard block 
+  const [blockdata, setBlockData] = useState([] ) ; 
   //const [isConnected, setIsConnected] = useState(socket.connected);
   // My "FooEvent" below as per socket-io documentation 
-  const [blockdata, setBlockData] = useState([] ) ; 
-
+  
   // Fetch all blocks data (used initially) from server 
   const fetchBlocks = async () => {
     const res = await fetch(`${flaskBackendAddress}/blockdata`) 
     const data = await res.json() 
-
     return data ;   
   }
   
@@ -48,7 +47,6 @@ function App() {
     console.log("executing...testblocks")
     const res = await fetch(`${flaskBackendAddress}/testWebSocket`) 
   }
-
   // Fetch indiv block data from server 
   // TODO: Currently not used (also not implemented on backend)
   const fetchBlock = async (id) => {
@@ -59,15 +57,13 @@ function App() {
 
   useEffect(() => {
     console.log("UseEffect()...")
-    // Get initial data 
-    // (Currently this sample static data to test frontent rendernig)
+    // Get data of events for each "Block" displayd in the dashboard 
     const getBlocks = async () => {
       const blocksFromServer = await fetchnewData() ; 
       {console.log("testBlockData -> " , blocksFromServer)}
       socket.emit("testEvent","*** this is my message ***")
       setBlockData(blocksFromServer);
   }
-
     getBlocks();
     // Get new event data for every block from backend 
     // TODO: replace SetInterval Polling implementation 
@@ -77,7 +73,9 @@ function App() {
     //     {console.log("newBlockData -> " , data)}
     //     setBlockData(data)
     // },3000)
-    //Web Socket Implementation 
+
+    //******************/
+    //Not Implemented: Initial Code to control WebSocket status with UI elements
     // function onConnect() {
     //   setIsConnected(true);
     // }
@@ -88,21 +86,27 @@ function App() {
 
     // socket.on('connect', onConnect);
     // socket.on('disconnect', onDisconnect);
+    //******************/
     
+    //-- Send a initial test_message to the server via WebSocket
+    //-- will also initilize websocket, upgrade to HTTPS, ... etc (see nginx configuration for more details)
     socket.emit('test_message', 'Hello from React');
+    // Listens for test response for server and gets block data
     socket.on('testResponse', (data) => {
       console.log('Received testResponse:', data);
       getBlocks();
     });
-
+    // Listens for requests from the server to update dashboard with newdata (triggered when event data is changed/deleted)
     socket.on('newdata', (data) => {
       console.log('Received data from Flask:', data);
       getBlocks();
     });
-
+    
+    //http request which asks for a WebSocket respone; useful for debugging WebSocket. 
     testWebSocket() ;
     // Clean up the effect
     return () => {
+      //** more UNIMPLENETED code for client control of websocket with UI */
       // socket.off('connect', onConnect);
       // socket.off('disconnect', onDisconnect);
       

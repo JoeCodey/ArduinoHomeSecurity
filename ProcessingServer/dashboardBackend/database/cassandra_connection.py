@@ -42,7 +42,7 @@ class MyCassandraDatabase:
         except Exception as e:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
-            print(Fore.RED+" DB ERROR ->\n -- %s -- \n\n" %(e))
+            log.error(" DB ERROR ->\n -- %s -- \n\n" %(str(e)))
       log.info("Returning reference to existing Cassandra DB")
       return MyCassandraDatabase.__instance
    
@@ -55,7 +55,6 @@ class MyCassandraDatabase:
       else:
          self.db_online = False
          MyCassandraDatabase.__instance = self
-         
          try:
             self.connectToCluster()
          except Exception as e:
@@ -63,6 +62,7 @@ class MyCassandraDatabase:
             error = str(e)
             #Wait for Cassandra docker container to be online (90 sec)
             timeout_at = dt.datetime.now() + timedelta(seconds=90)
+            #Attempt to connect to the Cassandra every {attempt_delay} seconds
             attempt_delay = 5 
             
             while(True and self.db_online != True):
@@ -81,7 +81,7 @@ class MyCassandraDatabase:
                         next_time += (time.time() - next_time) // attempt_delay * attempt_delay + attempt_delay
        
         # Check if cassandra docker needs to be coldstarted (Error 2200)
-        # ONLY USEFULL WHEN STARTING FROM MAC OS OUTSIDE A DOCKER ENVIRONMENT 
+        # ----> ONLY USEFULL WHEN STARTING FROM MAC OS OUTSIDE A DOCKER ENVIRONMENT 
             if platform.system() == 'Darwin':
                 if error.find('2200') and MyCassandraDatabase.__isStarting == False :
                     MyCassandraDatabase.__isStarting = True 
@@ -108,7 +108,6 @@ class MyCassandraDatabase:
    def connectToCluster(self): 
 
     self.cluster = Cluster([Cass_IP],port=9042)
-    #print(Fore.BLUE + str(self.__debug_counter)+"(Charlie) cassandra_connection ... Attempting to connect to Db")
     log.logic("cassandra_connection ... Attempting to connect to Db")
     self.__debug_counter += 1
     #If this line is executed, no error was thrown and Cass docker is online 
@@ -118,6 +117,7 @@ class MyCassandraDatabase:
     self.db_online = True 
     self.__isStarting = False   
     try:
+        #Load Cassandra Keyspace. Catch error and create keyspace if doesn't exist 
         self.session.execute('USE ahs_event_db')
     except Exception as e: 
         error = str(e)
@@ -154,10 +154,11 @@ class MyCassandraDatabase:
        '''
        Universal method to execute Cassandra querry
        Flags that data has change to WebSocket can communciate '''
-       #import function which updates the WebSocket connected to the front end
-       #from main controller file of the app (backendArdu...)
-    #    from flask import current_app
-    #    from server.backendArduinoHomeSecurity import update_websocket
+       #/** Depricated -> attempting to import Flask app context in order to trigger WebScoket responses
+       #/** import function which updates the WebSocket connected to the front end
+       #/** from main controller file of the app (backendArdu...)
+       #/** from flask import current_app
+       #/** from server.backendArduinoHomeSecurity import update_websocket
        
        try : 
            res = self.session.execute(query)
@@ -170,9 +171,11 @@ class MyCassandraDatabase:
            if query.find("insert")>=0 or query.find("delete")>=0 and web_sock_communication==True: 
                #executed query changed db -> update WebSocket
                log.info("Attempting to update front via WebSocket")
+               #** http request that can commnunicate using docker networking to trigger the Flask app to
+               #** Update the dashboard content in real-time via WebSocket
+               #** NOTE: This avoids having to import Flask app context to cassandra_connection.py
                response = requests.get("http://backend:8888/api/trigWebSockUpdate")
-               #with current_app.app_context():
-            # update_websocket()
+       
             # return results from query 
            return res 
        except Exception as e: 
