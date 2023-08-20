@@ -20,7 +20,7 @@
         "@testing-library/user-event": "^13.5.0",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "react-scripts": "^4.0.3",
+        "react-scripts": "^5.0.1",
         "socket.io-client": "^4.3.2"
     },
     "devDependencies": {
@@ -35,7 +35,7 @@
         "build": "react-scripts --openssl-legacy-provider build",
         "eject": "react-scripts eject",
         "server": "json-server --watch db.json --port 5000",
-        "start": "react-scripts --openssl-legacy-provider start",
+        "start": "react-scripts start",
         "test": "react-scripts test"
     },
     "version": "0.1.0"
