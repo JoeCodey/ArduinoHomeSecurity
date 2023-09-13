@@ -1,3 +1,4 @@
+# 
 FROM python:3.9
 
 RUN apt-get update -y 
@@ -18,3 +19,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 CMD ["gunicorn","--worker-class", "eventlet", "-w", "1","-b",":8888","server.backendArduinoHomeSecurity:app"]
 
 #CMD ["run", "--host=0.0.0.0","--port=8888"]    
+ 

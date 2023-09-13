@@ -1,10 +1,5 @@
 node_modules
-ArduinoUnit/ArduCam
-ArduinoUnit/libraries
-ArduinoUnit/SetUpTests
 .vscode/*
-ArduCam/*
-sourceCode_arduCamArduino/*
 package-lock.json
 .DS_Store
 .AHS_backend
@@ -13,13 +8,6 @@ package-lock.json
 *.swo
 
 ProcessingServer/dashboardBackend/.AHS_backend/
-ProcessingServer/dashboardBackend/15:11:51.712.jpg
-ProcessingServer/dashboardBackend/15:13:18.918.jpg
-ProcessingServer/dashboardBackend/15:15:45.618.jpg
-ProcessingServer/dashboardBackend/15:16:52.904.jpg
-ProcessingServer/dashboardBackend/15:17:24.187.jpg
-ProcessingServer/dashboardBackend/15:17:42.865.jpg
-ProcessingServer/dashboardBackend/15:19:18.995.jpg
 ProcessingServer/dashboardBackend/submits08fp4bl.tmp
 ProcessingServer/dashboardBackend/utput
 ProcessingServer/dashboardBackend/__pycache__/

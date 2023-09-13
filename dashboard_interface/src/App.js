@@ -11,12 +11,8 @@ import { ConnectionManager } from './components/ConnectionManager';
 
 // Generate initial starting states for grid in the form of  { id  : {dataType: "type" , data: ""}}
 const startingState = Array(8).fill(null).reduce((objects, _, index) => ({...objects, [index]: {dataType: index % 2 === 0 ? "text" : "video", data: " "}}), {})
-/* Must address flask backend as if outside the docker network (e.g. on the host machine)
- * ... because we are making requests from the browser, which is not in the docker network
- * Although curl requests from inside the frontend docker container 
- *  can use the docker network e.g. http://backend:$(port)/...
- *  */ 
 
+//Nginx server proxy configured as '/api' for communication with backend and databse
 const flaskBackendAddress = '/api'
 const webSocketBackendAddress = "/socket.io";
 console.log(process.env.NODE_ENV) 
@@ -37,7 +33,6 @@ function App() {
   }
   
   //fetch latest data from Flask backend 
-  //TODO: -- DONE -- Dockerize backend and frontentend for portability 
   const fetchnewData = async () => {
     const res = await fetch(`${flaskBackendAddress}/newblockdata`) 
     const data = await res.json() 
@@ -65,37 +60,8 @@ function App() {
       setBlockData(blocksFromServer);
   }
     getBlocks();
-    // Get new event data for every block from backend 
-    // TODO: replace SetInterval Polling implementation 
-    // with realtime Web Socket Connection 
-    // const timer = setInterval(async () => {
-    //     const data = await fetchnewData()
-    //     {console.log("newBlockData -> " , data)}
-    //     setBlockData(data)
-    // },3000)
-
-    //******************/
-    //Not Implemented: Initial Code to control WebSocket status with UI elements
-    // function onConnect() {
-    //   setIsConnected(true);
-    // }
     
-    // function onDisconnect() {
-    //   setIsConnected(false);
-    // }
 
-    // socket.on('connect', onConnect);
-    // socket.on('disconnect', onDisconnect);
-    //******************/
-    
-    //-- Send a initial test_message to the server via WebSocket
-    //-- will also initilize websocket, upgrade to HTTPS, ... etc (see nginx configuration for more details)
-    socket.emit('test_message', 'Hello from React');
-    // Listens for test response for server and gets block data
-    socket.on('testResponse', (data) => {
-      console.log('Received testResponse:', data);
-      getBlocks();
-    });
     // Listens for requests from the server to update dashboard with newdata (triggered when event data is changed/deleted)
     socket.on('newdata', (data) => {
       console.log('Received data from Flask:', data);
@@ -103,13 +69,10 @@ function App() {
     });
     
     //http request which asks for a WebSocket respone; useful for debugging WebSocket. 
-    testWebSocket() ;
-    // Clean up the effect
+    //testWebSocket() ;
+    
     return () => {
-      //** more UNIMPLENETED code for client control of websocket with UI */
-      // socket.off('connect', onConnect);
-      // socket.off('disconnect', onDisconnect);
-      
+    
     };
 
   }, [])
@@ -122,8 +85,6 @@ function App() {
         <h1>Active Information Dashboard
         </h1>
       </header>
-      {/* <ConnectionState isConnected={ isConnected }/>
-      <ConnectionManager />  */}
 
       <div className="Grid-Layouts">
     
@@ -134,4 +95,30 @@ function App() {
 }
 
 export default App;
+
+//******* FUTURE feats *************/
+    //Not Implemented: Initial Code to control WebSocket status with UI elements
+    // function onConnect() {
+    //   setIsConnected(true);
+    // }
+    
+    // function onDisconnect() {
+    //   setIsConnected(false);
+    // }
+
+    // socket.on('connect', onConnect);
+    // socket.on('disconnect', onDisconnect);
+
+    //  {/* <ConnectionState isConnected={ isConnected }/>
+    //   <ConnectionManager />  */}
+
+    // return () => {
+    //   ** more UNIMPLENETED code for client control of websocket with UI */
+    //   socket.off('connect', onConnect);
+    //   socket.off('disconnect', onDisconnect);
+      
+    // };
+  
+    // }, [])
+    //******************/
  
