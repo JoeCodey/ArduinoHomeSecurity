@@ -1,3 +1,5 @@
+# This Dockerfiles is ONLY used when NOT using nginx proxy server 
+
 FROM node:latest 
 
 # Create app directory 

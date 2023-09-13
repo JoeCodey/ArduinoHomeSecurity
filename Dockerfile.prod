@@ -1,3 +1,8 @@
+# This Dockerfile ... 
+#   - compiles react into static production build files 
+#   - serves react files from nginx proxy server 
+
+
 FROM node:latest as base 
 
 # Create app directory 
