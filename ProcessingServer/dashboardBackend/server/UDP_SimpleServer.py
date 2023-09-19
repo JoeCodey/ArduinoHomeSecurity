@@ -6,6 +6,7 @@ from colorama import Fore, Back, Style
 from server.ArduCam_Backend import isCameraAvail,runArduCam
 from utilities.tools_and_tests import genTimeStamp, getUniqueId, ping_address
 from database.cassandra_connection import MyCassandraDatabase 
+from utilities.logger import get_logger_obj
 
 
 UDP_PORT = 50000
@@ -15,6 +16,7 @@ elif platform.system() == 'Linux':
     UDP_IP = socket.gethostbyname(socket.gethostname())
     UDP_PORT = 5000
 
+log = get_logger_obj() 
 class realTimeEventSocket :
     
     def __init__(self, database =None, host_IP=UDP_IP, port=UDP_PORT, espSensorType='text'):
@@ -61,25 +63,30 @@ class realTimeEventSocket :
                 json_data['dataType'] = self.espSensorType 
                 json_data['location'] = 'entrance' 
                 json_data['timeStart'] = genTimeStamp()
-                #check if camera data is available        
-                if(isCameraAvail()):
+                json_data['cameraData'] = 'no'
+                #check if camera data is available      
+                camera_flag = isCameraAvail() 
+                log.debug("is camera available? %s"%(camera_flag))
+                if(camera_flag):
                     thread = threading.Thread(target=runArduCam, args= (event_id,123))
                     thread.start()
                     json_data["imagePath"] = "./imageCache/" + str(event_id) + ".jpg"
                     json_data["cameraData"] = 'yes'
-                          
-                          
+                       
             if(data.find("Ended") >= 0 ):
-                json_data['timeEnd'] = genTimeStamp()         
+                json_data['timeEnd'] = genTimeStamp()    
+                # TODO: add a timeout when waiting for thread containing image
+                if (json_data['cameraData'] == 'yes'):
+                    thread.join()      
                 if ('timeStart' in json_data):
                     # write data to cassandra 
-                    thread.join()
+                    log.debug("Attempting to write new data to DB, Camera?= %s"%(json_data['cameraData']))
                     self.database.insertJSON(json_data) 
                     #write to array to store in JSON file 
                     self.eventlist.append(json_data)
                 json_data = {}
                 index += 1 
-
+                log.info("Path is currently %s"%(os.getcwd()))
                 with open("./JSON/newData.json","w") as write_file:    
                  json.dump(self.eventlist,write_file)
     
@@ -101,7 +108,9 @@ class realTimeEventSocket :
         return False
 
 def start_socket(_host_IP=UDP_IP):
+
     print(Fore.YELLOW+"... Executing start_socket() procedure ... ")
+    log.debug("Attempted to start socket")
     # Get reference to Cassandra Db
     cassandra_db = MyCassandraDatabase.getInstance()
     print(Fore.GREEN + "Cass Db instance -> %s " % (type(cassandra_db)), Style.RESET_ALL)
