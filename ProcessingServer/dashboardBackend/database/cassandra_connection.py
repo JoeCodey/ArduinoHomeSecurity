@@ -154,7 +154,7 @@ class MyCassandraDatabase:
        '''
        Universal method to execute Cassandra querry
        Flags that data has change to WebSocket can communciate '''
-       #/** Depricated -> attempting to import Flask app context in order to trigger WebScoket responses
+       #/** --- Depricated -> attempting to import Flask app context in order to trigger WebScoket responses
        #/** import function which updates the WebSocket connected to the front end
        #/** from main controller file of the app (backendArdu...)
        #/** from flask import current_app
@@ -278,7 +278,7 @@ class CassandraDbManualTools:
             test_events = os.listdir("./imageCache")
         except Exception as e: 
             log.error(str(e))
-        for event in test_events : 
+        for event in test_events[1:5] : 
             # note InsertCustomEvent strips file extensions
             # -- e.g. feed function "testexample.jpg"
             #print("attempting to insert %s"%(event))

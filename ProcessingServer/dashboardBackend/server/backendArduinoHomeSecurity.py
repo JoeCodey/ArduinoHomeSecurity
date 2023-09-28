@@ -17,6 +17,8 @@ from server.UDP_SimpleServer import start_socket
 from server.ArduCam_Backend import base_ArduCam_IP
 from utilities.tools_and_tests import gen_filename, TestCassDb
 from utilities.logger import get_logger_obj
+# new version of UDP server. Considering separating the server from Application.
+from api.devices import start_RealTimeEventSocketManager
 
 
 
@@ -55,13 +57,14 @@ q = Queue(maxsize=11)
 
 #Start Cassandra Database and check connection 
 db = MyCassandraDatabase.getInstance() 
+#db.deleteAll()
 print("Cass Db instance -> %s " % (type(db)))   
 
 #Start realTimeEventSocket to talk to ESP8266 devices
 
 print("... Starting ESP sockdet ...")
 # (Complete) TODO: .begin() call blocks flask backend from starting ... create new thread?
-thread_event_socket = threading.Thread(target=start_socket)
+thread_event_socket = threading.Thread(target=start_RealTimeEventSocketManager)
 thread_event_socket.start()
 
 # DEPRICATED: 
