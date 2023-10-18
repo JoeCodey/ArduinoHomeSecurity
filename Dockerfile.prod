@@ -2,7 +2,6 @@
 #   - compiles react into static production build files 
 #   - serves react files from nginx proxy server 
 
-
 FROM node:latest as base 
 
 # Create app directory 
@@ -10,8 +9,13 @@ RUN mkdir -p /app
 WORKDIR /app 
 
 COPY ./dashboard_interface/package.json ./
+COPY ./dashboard_interface/package-lock.json ./
 COPY ./dashboard_interface/src ./src
 COPY ./dashboard_interface/public ./public
+#Executing "RUN npm ci" may be a better choice is some development environments, 
+#   * if we want a clean/repeatable install form the package-lock.json file
+#   * Throws error if package.json and package-lock.json are mismatcehd 
+#   * Usefull when working with multiple team members on multiple machines. 
 RUN npm install 
 RUN ls
 RUN npm run build 
