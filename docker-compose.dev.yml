@@ -22,7 +22,7 @@ services:
         volumes:
             - /var/lib/cassandra/data
         ports:
-            - 9043:9042
+            - 9043:9043
         command: bash -c 'sleep 60;  /docker-entrypoint.sh cassandra -f'
         depends_on:
         - cas1
