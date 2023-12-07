@@ -2,7 +2,7 @@ import requests , shutil
 import threading, time 
 import subprocess
 
-base_ArduCam_IP = "192.168.0.42"
+base_ArduCam_IP = "192.168.2.42"
 class ArduCamBackend:
     def __init__(self,ip = base_ArduCam_IP):
         self.base_ip = ip
