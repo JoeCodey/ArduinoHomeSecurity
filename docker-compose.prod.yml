@@ -39,6 +39,7 @@ services:
             - 8888
         ports: 
             - 127.0.0.1:5000:8888
+            #TODO: what does this /udp do? Is it necessary?
             - $HOST_IP:50000:5000/udp
 
         depends_on:     
