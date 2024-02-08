@@ -16,7 +16,9 @@ COPY ./dashboard_interface/public ./public
 #   * if we want a clean/repeatable install form the package-lock.json file
 #   * Throws error if package.json and package-lock.json are mismatcehd 
 #   * Usefull when working with multiple team members on multiple machines. 
+RUN npm cache clean --force
 RUN npm install 
+
 RUN ls
 RUN npm run build 
 

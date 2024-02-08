@@ -15,13 +15,16 @@ echo "Exported HOST_DEVICES_ON_NETWORK: $HOST_DEVICES_ON_NETWORK"
 
 echo $HOST_IP
 echo $1
+echo $2
 
-if [ $1 = "prod" ] 
-then 
+if [ "$1" = "prod" ] && [ "$2" = "nodb" ]; then
+    echo "Building without restarting db mode"
+    echo "docker-compose -f docker-compose.prod.yml up -d --no-deps --build frontend backend &"
+    docker-compose -f docker-compose.prod.yml up -d --no-deps --build frontend backend &
+elif [ "$1" = "prod" ]; then
     echo "Building in Production mode"
-    docker-compose -f docker-compose.prod.yml up --build 
-#Spin Up in Development mode 
-else 
-    echo "Building in Dev mode "
+    docker-compose -f docker-compose.prod.yml up --build
+else
+    echo "Building in Dev mode"
     docker-compose -f docker-compose.dev.yml up --build
 fi

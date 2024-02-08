@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import GridInformation from './components/informationGrid.js' ;
+import WebsocketButton from './components/buttons.js' ;
 import {useState, useEffect } from 'react' ;
 import './App.css';
 import './components/informationGrid.css' ;
@@ -40,7 +41,10 @@ function App() {
   }
   const testWebSocket = async () => {
     console.log("executing...testblocks")
+    const startTime = new Date() 
     const res = await fetch(`${flaskBackendAddress}/testWebSocket`) 
+    console.log("time for reply -> ", new Date() - startTime)
+    socket.emit("test_message","*** this is my message form App.js getBlocks() ***")
   }
   // Fetch indiv block data from server 
   // TODO: Currently not used (also not implemented on backend)
@@ -56,20 +60,39 @@ function App() {
     const getBlocks = async () => {
       const blocksFromServer = await fetchnewData() ; 
       {console.log("testBlockData -> " , blocksFromServer)}
-      socket.emit("testEvent","*** this is my message ***")
       setBlockData(blocksFromServer);
   }
     getBlocks();
-    
 
+    testWebSocket() ; 
+
+    socket.on('connect', function() {
+      socket.emit('connected', "client is super connected to server");
+    });
+    socket.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+
+    
     // Listens for requests from the server to update dashboard with newdata (triggered when event data is changed/deleted)
-    socket.on('newdata', (data) => {
+    socket.on('new_data', (data) => {
       console.log('Received data from Flask:', data);
+      //TODO: this should just call setbloickdata() directly to update the dashboard
       getBlocks();
     });
+    socket.on('test_response', (data) => { 
+      console.log("testResponse received from server: ", data)
+    });
+
+    //TEST fuction to update dashboard directly with data form server. Instead of telling client to ask server for data. 
+    socket.on("new_data_from_server", (data) => {
+      console.log("new_data_from_server: ", data)
+      setBlockData(data);
+    });
+
     
     //http request which asks for a WebSocket respone; useful for debugging WebSocket. 
-    //testWebSocket() ;
+    //testWebSocket();
     
     return () => {
     
@@ -84,6 +107,7 @@ function App() {
 
         <h1>Active Information Dashboard
         </h1>
+        <WebsocketButton socket={socket} />
       </header>
 
       <div className="Grid-Layouts">
