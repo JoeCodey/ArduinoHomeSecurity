@@ -54,7 +54,14 @@ services:
             - CASSANDRA_HOST=cas1 
             - HOST_IP=host.docker.internal
             - HOST_DEVICES_ON_NETWORK=${HOST_DEVICES_ON_NETWORK}
-            
+    
+    redis:
+        container_name: redis
+        image: redis:latest
+        ports: 
+            - 6379:6379
+        
+
     frontend: 
         build: 
           context: .
