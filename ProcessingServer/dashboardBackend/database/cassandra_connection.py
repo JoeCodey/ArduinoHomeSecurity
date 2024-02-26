@@ -30,6 +30,9 @@ def getUniqueId():
 #Get custom logger object from utilites module {Log.error()...}
 log = get_logger_obj() 
 
+
+
+
 class MyCassandraDatabase:
    '''
     Encapsulation of cassandra database implementation **Implements Singleton pattern, so only one database can be created** 
@@ -39,11 +42,11 @@ class MyCassandraDatabase:
    __debug_counter =0
    
    @staticmethod 
-   def getInstance(FlaskAppContext=None,socket_io_cass=None):   
+   def getInstance(FlaskAppContext=None):   
       """ Static access method. """
       if MyCassandraDatabase.__instance == None:
         try: 
-            MyCassandraDatabase(FlaskAppContext,socket_io_cass)
+            MyCassandraDatabase(FlaskAppContext=None)
         except Exception as e:
             # print("Err Occured ->  %s" % (e)) 
             error = str(e)
@@ -53,6 +56,12 @@ class MyCassandraDatabase:
    
    def __init__(self,FlaskAppContext=None,socket_io_cass=None):
       """ Virtually private constructor. """
+      self.keyspace_id = 'ahs_event_db'
+      #lines to get context from flask app, so we can call socketio.emit() from cassandra_connection.py
+      from server.backendArduinoHomeSecurity import app 
+      self.socketio_mycassdb = SocketIO(message_queue='redis://redis:6379')
+      
+      self.FlaskAppContext = app 
       
       if MyCassandraDatabase.__instance != None:
          raise Exception("This class is a singleton! We only have one database bro.")
@@ -94,7 +103,7 @@ class MyCassandraDatabase:
                         
                         next_time += (time.time() - next_time) // attempt_delay * attempt_delay + attempt_delay
    
-   def close(self):
+   def close_actually_closes_connection(self):
         """Close the Cassandra connection."""
         if hasattr(self, 'session') and self.session:
             self.session.shutdown()
@@ -103,7 +112,13 @@ class MyCassandraDatabase:
             self.cluster.shutdown()
         MyCassandraDatabase.__instance = None
         log.info("Cassandra Db connection closed.")
-       
+   
+   def close(self):
+     """Close the connection to the Cassandra cluster."""
+     try:
+        print("doing nothign")
+     except Exception as e:
+        log.error(f"Error occurred while closing Cassandra connection: {str(e)}")
 
    def connectToCluster(self): 
 
@@ -158,8 +173,9 @@ class MyCassandraDatabase:
        #/** --- Depricated -> attempting to import Flask app context in order to trigger WebScoket responses
        #/** import function which updates the WebSocket connected to the front end
        #/** from main controller file of the app (backendArdu...)
-    #    from server.backendArduinoHomeSecurity import socketio
-    #    local_socketio = socketio
+       from server.backendArduinoHomeSecurity import update_websocket
+       from server.backendArduinoHomeSecurity import socketio
+       #local_socketio = socketio
        #local_socketio = SocketIO(self.FlaskAppContext, cors_allowed_origins="http://localhost:3000",logger=True, engineio_logger=True) 
        #local_socketio = SocketIO() 
        try : 
@@ -169,29 +185,39 @@ class MyCassandraDatabase:
            query = query.lower()    
            insert_truth = query.find("insert")>=0
            delete_truth = query.find("delete")>=0
-           log.logic("query -> %s ||| truth value -> %s,%s"%(query,str(insert_truth),str(delete_truth)))
-           if insert_truth or delete_truth and web_sock_communication==True: 
-               #executed query changed db -> update WebSocket
-               log.info("Db changing query %s receivedAttempting to update front via WebSocket")
-               #** http request that can commnunicate using docker networking to trigger the Flask app to
-               #** Update the dashboard content in real-time via WebSocket
-               #** NOTE: This avoids having to import Flask app context to cassandra_connection.py
-               #response = requests.get("http://backend:8888/api/trigWebSockUpdate")
-               #from server.backendArduinoHomeSecurity import update_websocket   
-               #import update_websocket 
-            #    from server.backendArduinoHomeSecurity import socketio
-            #    socketio_instance = self.flaskAppContext.current_app.extensions['socketio']
-            #    
-               self.socket_io_cass.emit('new_data_from_server','get new data from server',namespace='/socket.io')
-               #socketio_instance.emit('new_data_from_server','get new data from server',namespace='/socket.io')
-                #    with self.FlaskAppContext.app_context():
-                #        log.debug("App Context from Cassandra_connection --> "+str(current_app.name))
-                #        local_socketio.emit('new_data','get new data from server',namespace='/socket.io')
-                   
-       
-            # return results from query 
-               #from server.backendArduinoHomeSecurity import socketio
-               #local_socketio.emit('new_data',"get new data",namespace='/socket.io')
+           truncate_truth = query.find("truncate")>=0
+           #log.debug("query -> %s ||| truth value -> %s,%s"%(query,str(insert_truth),str(delete_truth)))
+
+           # /**- Check if query changes db contents (add,delete) 
+           try:
+            if insert_truth or delete_truth or truncate_truth and web_sock_communication==True: 
+                #executed query changed db -> update WebSocket
+                log.info("Db changing query %s receivedAttempting to update front via WebSocket")
+                #** http request that can commnunicate using docker networking to trigger the Flask app to
+                #** Update the dashboard content in real-time via WebSocket
+                #** NOTE: This avoids having to import Flask app context to cassandra_connection.py
+                #response = requests.get("http://backend:8888/api/trigWebSockUpdate")
+                from server.backendArduinoHomeSecurity import socketio
+                with self.FlaskAppContext.app_context():
+                    log.debug("App Context from Cassandra_connection --> "+str(current_app.name))
+                    #call_update_websocket_with_context()  
+                    # connect to the redis queue as an external process
+                    #    external_sio = socketio.RedisManager('redis://', write_only=True)
+                    
+                    #self.socketio_mycassdb.emit('new_data','from_mycassdb !!',namespace='/socket.io')
+                    update_websocket()
+                    #    with self.FlaskAppContext.app_context():
+                    #        log.debug("App Context from Cassandra_connection --> "+str(current_app.name))
+                    #        local_socketio.emit('new_data','get new data from server',namespace='/socket.io')
+                    
+        
+                # return results from query 
+                return res
+                #from server.backendArduinoHomeSecurity import socketio
+                #local_socketio.emit('new_data',"get new data",namespace='/socket.io')
+           except Exception as e:
+             log.error(str(e))
+           # returns results from query despite failure of websocket update
            return res 
        except Exception as e: 
            log.error(str(e))
@@ -217,11 +243,8 @@ class MyCassandraDatabase:
         query = "Delete from eventtable where event_id = %s " % (_id)
         self.execute_query(query)
    def deleteAll(self):
-       query = 'select JSON* from eventtable' 
+       query = 'truncate eventtable' 
        res_set = self.execute_query(query)
-       for row in res_set:
-           json_elem = json.loads(row.json)
-           self.deleteRow(json_elem['event_id'])
         
 
    def insertTestRow(self):

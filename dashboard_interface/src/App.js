@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import GridInformation from './components/informationGrid.js' ;
-import WebsocketButton from './components/buttons.js' ;
+import { WebsocketButton, DeleteAllButton } from './components/buttons.js';
 import {useState, useEffect } from 'react' ;
 import './App.css';
 import './components/informationGrid.css' ;
@@ -108,6 +108,7 @@ function App() {
         <h1>Active Information Dashboard
         </h1>
         <WebsocketButton socket={socket} />
+        <DeleteAllButton />
       </header>
 
       <div className="Grid-Layouts">

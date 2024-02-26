@@ -22,7 +22,6 @@ def ping_address(addr):
         print("ping to", addr, "failed!")
 
 
-
 def gen_filename(extension='.jpg') : 
     """Generates filename with current time. \n
     Provide extension to change default '.jpg' \n

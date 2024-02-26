@@ -19,8 +19,8 @@ echo $2
 
 if [ "$1" = "prod" ] && [ "$2" = "nodb" ]; then
     echo "Building without restarting db mode"
-    echo "docker-compose -f docker-compose.prod.yml up -d --no-deps --build frontend backend &"
-    docker-compose -f docker-compose.prod.yml up -d --no-deps --build frontend backend &
+    echo "docker-compose -f docker-compose.prod.yml up -d --no-deps --build frontend backend redis &"
+    docker-compose -f docker-compose.prod.yml up -d --no-deps --build frontend backend redis &
 elif [ "$1" = "prod" ]; then
     echo "Building in Production mode"
     docker-compose -f docker-compose.prod.yml up --build

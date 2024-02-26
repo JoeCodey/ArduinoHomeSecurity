@@ -1,4 +1,8 @@
 
+ #Monkey patching to allow for eventlet to work with socketio
+    # Chgpt -> Monkey patching is a technique used to change or extend the behavior of libraries or modules at runtime without modifying the source code. 
+import eventlet  
+eventlet.monkey_patch()
 from flask import Flask, current_app,redirect, url_for, request, send_file, jsonify, g
 import flask_cors
 from flask_socketio import SocketIO , Namespace
@@ -17,12 +21,17 @@ from server.UDP_SimpleServer import start_socket
 from server.ArduCam_Backend import base_ArduCam_IP
 from utilities.tools_and_tests import gen_filename, run_db_unittest
 from utilities.logger import get_logger_obj
-import eventlet 
+
+import redis 
+
+#Testfile to send socketio event from external file/process 
+from database.external_process_socketio import send_external_socketio_event
+from database.external_process_socketio import send_external_socketio_event_thread
 
 # new version of UDP server. Considering separating the server from Application.
 from api.devices import start_RealTimeEventSocketManager
 class WebSockCustomNamespace(Namespace):
-   '''Class which implements socket.io functions to listen and emit events on the namespace '/socker.io used
+   '''Class which implements socket.io functions to listen and emit evnts on the namespace '/socker.io used
    by the client.'''
    def on_connect(self):
         print('Client connected to namespace /socket.io')
@@ -38,19 +47,18 @@ class WebSockCustomNamespace(Namespace):
       socketio.emit('test_response','** SERVER (on_test_message) ---->'+message,namespace='/socket.io')
 
 def create_app():
-    # 
-    eventlet.monkey_patch()
+   
     app = Flask(__name__)
-    socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000",logger=True, engineio_logger=True)
+    socketio = SocketIO(app, 
+      message_queue='redis://redis:6379',cors_allowed_origins="http://localhost:3000",logger=True, engineio_logger=True)
     socketio.on_namespace(WebSockCustomNamespace('/socket.io'))
-    with app.app_context():
-       get_db(app,socketio)
-
-    return app,socketio
+    time.sleep(3)
+    
+    return app, socketio
 
 def get_db(app=None,socketio=None):
       if 'db' not in g:
-         g.db = MyCassandraDatabase.getInstance(FlaskAppContext=app,socket_io_cass = socketio)
+         g.db = MyCassandraDatabase.getInstance(FlaskAppContext=app)
       return g.db
 
 
@@ -59,7 +67,14 @@ log.majorcheckpoint("Main? -> %s, Where are we? -> %s" %(__name__=='__main__',st
 
 # Q?: can you write documentation for the next line 
 # Flask app created with
-app,socketio = create_app()
+app, socketio = create_app()
+with app.app_context():
+       get_db(app,socketio)
+
+
+# mgr = socketio.RedisManager('redis://')
+# sio = socketio.Server(client_manager=mgr)
+
 #Acknowledge initiation of Flask App and that it exists  
 log.majorcheckpoint("BACKEND: Flask Defined , exec: app = %s" % Flask(__name__))
 '''
@@ -126,6 +141,9 @@ log.majorcheckpoint("... Starting ESP sockdet ...")
 thread_event_socket = threading.Thread(target=start_RealTimeEventSocketManager)
 thread_event_socket.start()
 
+thread_external_event = threading.Thread(target=send_external_socketio_event_thread)
+thread_external_event.start() 
+
 
 if __name__ == '__main__':
    log.majorcheckpoint("... Attempting to run Flask app from main file (__name__=='__main__') ... ")
@@ -150,13 +168,21 @@ def hello():
     log.debug("@...flask/api/testWebSocket")
     #Give socket time to establish connection
     time.sleep(3)
-    log.majorcheckpoint("...****-> do I have a global sid memer var? -> "+str(g.sid))
+    #log.majorcheckpoint("...****-> do I have a global sid memer var? -> "+str(g.sid))
     bhs_emmit_event_external_process()
+    send_external_socketio_event(socketio) 
     log.debug("... emitting testResponse from route /api/testWebSocket")
     socketio.emit('test_response',"replying to testWebSocket() react function",namespace='/socket.io')
     #update_websocket()
     
     return 'Hello World'
+@app.route('/api/deleteall')
+def delete_all():
+   db = get_db(app)
+   db.deleteAll()
+   return 'none'
+
+
 
 #Http Route which triggers a WebSocket 
 @app.route('/api/trigWebSockUpdate')
@@ -285,8 +311,8 @@ def close_db(e=None):
 
 def bhs_emmit_event_external_process():
     log = get_logger_obj()
-    log.info("emmit_event_external_process")
-    socketio.emit('test_response', 'Server generated event', namespace='/socket.io')
+    log.debug("emmit_event_external_process")
+    socketio.emit('test_response', 'bhs_emit_event_external_process', namespace='/socket.io')
 
 
 
@@ -295,11 +321,11 @@ log.majorcheckpoint("\n\n... Running db unit tests ...\n")
 # time.sleep(3)
 #run_db_unittest() 
 
-log.majorcheckpoint("running bhs emmit event external process manually")
-with app.app_context():
-   bhs_emmit_event_external_process()
-   time.sleep(5)
-   bhs_emmit_event_external_process()
+# log.majorcheckpoint("running bhs emmit event external process manually")
+# with app.app_context():
+#    bhs_emmit_event_external_process()
+#    time.sleep(5)
+#    bhs_emmit_event_external_process()
 
 
 
